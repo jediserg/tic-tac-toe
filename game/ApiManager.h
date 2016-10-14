@@ -16,8 +16,9 @@ public:
     const Api& api(const std::string& name);
     bool hasApi(const std::string name);
 
-    bool callApi(const std::string& name, nlohmann::json&& response, Api::Callback callback);
+    bool callApi(nlohmann::json&& request, Api::Callback callback);
 
+    static constexpr const char* API_FIELD = "api";
 private:
     ApiMap _api_map;
 };
