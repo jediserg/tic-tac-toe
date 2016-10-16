@@ -13,7 +13,7 @@ class ApiManager {
 public:
     using ApiMap = std::map<std::string, Api>;
 
-    const Api& api(const std::string& name);
+    Api &api(const std::string &name);
     bool hasApi(const std::string name);
 
     bool callApi(nlohmann::json&& request, Api::Callback callback);

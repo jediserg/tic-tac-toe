@@ -13,18 +13,21 @@ TEST(ApiManagerCheck, AddGetApi) {
     ApiManager api_manager;
 
     //create api
-    auto api1 = api_manager.api("1.0");
-    auto api2 = api_manager.api("2.0");
+    Api &api1 = api_manager.api("1.0");
+    Api &api2 = api_manager.api("2.0");
 
     EXPECT_EQ("1.0", api1.name());
-    EXPECT_EQ("1.0", api2.name());
+    EXPECT_EQ("2.0", api2.name());
 
     EXPECT_TRUE(api1.isEnabled());
     EXPECT_TRUE(api2.isEnabled());
 
+    api1.disable();
+    api2.disable();
+
     //return existing api
-    EXPECT_EQ(&api1, &api_manager.api("1.0"));
-    EXPECT_EQ(&api2, &api_manager.api("2.0"));
+    EXPECT_FALSE(api_manager.api("1.0").isEnabled());
+    EXPECT_FALSE(api_manager.api("2.0").isEnabled());
 
     EXPECT_TRUE(api_manager.hasApi("1.0"));
     EXPECT_TRUE(api_manager.hasApi("2.0"));

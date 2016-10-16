@@ -5,21 +5,23 @@
 #include "ApiManager.h"
 #include <json.hpp>
 
-const Api &ApiManager::api(const std::string& name) {
-    ApiMap::const_iterator it = _api_map.find(name);
+Api &ApiManager::api(const std::string &name)
+{
+    ApiMap::iterator it = _api_map.find(name);
 
     if(it == _api_map.end())
     {
+        std::cout << "create new api" << std::endl;
         auto result = _api_map.emplace(name, name);
 
         return result.first->second;
     }
-
+    std::cout << "existing api" << std::endl;
     return it->second;
 }
 
 bool ApiManager::hasApi(const std::string name) {
-    return _api_map.find(name) == _api_map.end();
+    return _api_map.find(name) != _api_map.end();
 }
 
 bool ApiManager::callApi(nlohmann::json&& request, Api::Callback callback) {

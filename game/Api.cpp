@@ -8,7 +8,6 @@
 Api::Api(std::string name)
     :   _is_enabled(true),
         _name(std::move(name)){
-
 }
 
 bool Api::isEnabled() const {

@@ -17,8 +17,13 @@ public:
     using Handler = std::function<bool (nlohmann::json&&, Callback)>;
     using Handlers = std::map<std::string, Handler>;
 
-    Api() = delete;
     Api(std::string name);
+
+    //Api(const Api&) = delete;
+    //Api(Api&&) = delete;
+    Api() = delete;
+
+    Api &operator=(const Api &) = delete;
 
     bool isEnabled() const;
     void enable();
@@ -31,6 +36,8 @@ public:
     void setHandler(const std::string& command, Handler handler);
 
     static constexpr const char* COMMAND_FIELD = "command";
+
+
 private:
     bool _is_enabled;
     Handlers _handlers;
