@@ -9,4 +9,4 @@ add_executable(game_tests
         api_check.cpp
         api_manager_check.cpp server_check.cpp FakeServer.cpp FakeServer.h ../game/SessionManager.h)
 
-target_link_libraries(game_tests gtest gtest_main game)
+target_link_libraries(game_tests gtest gtest_main game mysqlclient)

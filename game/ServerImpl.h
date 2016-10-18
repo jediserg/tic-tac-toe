@@ -5,7 +5,7 @@
 #ifndef TIC_TAC_TOE_SERVERIMPL_H
 #define TIC_TAC_TOE_SERVERIMPL_H
 
-
+/*
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 
@@ -22,7 +22,7 @@ public:
 
 private:
     server m_endpoint;
-};
+};*/
 
 
 #endif //TIC_TAC_TOE_SERVERIMPL_H

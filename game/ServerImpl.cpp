@@ -4,7 +4,7 @@
 
 #include "ServerImpl.h"
 
-ServerImpl::ServerImpl()
+/*ServerImpl::ServerImpl()
 {
     // Set logging settings
     //m_endpoint.set_error_channels(websocketpp::log::elevel::all);
@@ -24,4 +24,4 @@ void ServerImpl::run()
 
     // Start the Asio io_service run loop
     //m_endpoint.run();
-}
+}*/

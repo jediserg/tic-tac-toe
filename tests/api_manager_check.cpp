@@ -4,8 +4,9 @@
 
 #include <gtest/gtest.h>
 #include <json.hpp>
-
+#include <memory>
 #include "ApiManager.h"
+#include "User.h"
 
 using namespace nlohmann;
 
@@ -29,10 +30,10 @@ TEST(ApiManagerCheck, AddGetApi) {
     EXPECT_FALSE(api_manager.api("1.0").isEnabled());
     EXPECT_FALSE(api_manager.api("2.0").isEnabled());
 
-    EXPECT_TRUE(api_manager.hasApi("1.0"));
-    EXPECT_TRUE(api_manager.hasApi("2.0"));
+    EXPECT_TRUE(api_manager.supportApi("1.0"));
+    EXPECT_TRUE(api_manager.supportApi("2.0"));
 
-    EXPECT_FALSE(api_manager.hasApi("3.0"));
+    EXPECT_FALSE(api_manager.supportApi("3.0"));
 
 
 }
@@ -44,7 +45,9 @@ TEST(ApiManagerCheck, CallApi) {
     auto api1 = api_manager.api("1.0");
     auto api2 = api_manager.api("2.0");
 
-    api1.setHandler("test", [](json&& request, Api::Callback callback){
+    std::shared_ptr<User> test_user = std::make_shared<User>("Name");
+
+    api1.setHandler("test", [](std::shared_ptr<User> user, json &&request, Api::Callback callback) {
         json response {
                {"result", "OK"}
         };
@@ -60,7 +63,7 @@ TEST(ApiManagerCheck, CallApi) {
             {"param", "test"}
     };
 
-    EXPECT_FALSE(api_manager.callApi(std::move(no_api_request), [](json&& response){
+    EXPECT_FALSE(api_manager.callApi(test_user, std::move(no_api_request), [](json &&response) {
         FAIL();
     }));
 
@@ -70,7 +73,7 @@ TEST(ApiManagerCheck, CallApi) {
             {"param", "test"}
     };
 
-    EXPECT_FALSE(api_manager.callApi(std::move(bad_api_request), [](json&& response){
+    EXPECT_FALSE(api_manager.callApi(test_user, std::move(bad_api_request), [](json &&response) {
         FAIL();
     }));
 
@@ -80,7 +83,7 @@ TEST(ApiManagerCheck, CallApi) {
             {Api::COMMAND_FIELD, "test"},
             {"param", "param"}
     };
-    EXPECT_TRUE(api_manager.callApi(std::move(good_request), [](json&& response){
+    EXPECT_TRUE(api_manager.callApi(test_user, std::move(good_request), [](json &&response) {
         ;
     }));
 }

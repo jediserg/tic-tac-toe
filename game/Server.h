@@ -43,30 +43,41 @@ private:
 
     void onMessage(Impl::Connection connection, nlohmann::json request)
     {
-        _session_mgr.checkAuth(
-                std::move(request),
+        auto api_name_it = request.find(ApiManager::API_FIELD);
+
+        if (api_name_it == request.end()) {
+            sendMessage(connection, {{"error", "No api specified"}});
+            return;
+        }
+
+        if (!_api_manager.supportApi(*api_name_it)) {
+            sendMessage(connection, {{"error", "Unsupported Api"}});
+            return;
+        }
+
+        auto command_it = request.find(Api::COMMAND_FIELD);
+
+        if (command_it == request.end()) {
+            sendMessage(connection, {{"error", "Command is not specified"}});
+            return;
+        }
+
+        auto &api = _api_manager.api(*api_name_it);
+
+        if (!api.call(_session_mgr.std::move(request),
+                      std::bind(&ServerType::sendMessage, this, connection, std::placeholders::_1)))){
+            sendMessage(connection, {{"error", "Unsupported command"}});
+        }
                 [connection](nlohmann::json &&response)
                     { //User authorized, call command handler
-                        auto api_name_it = request.find(ApiManager::API_FIELD);
-                        if(api_name_it == request.end())
-                        {
-                            sendMessage(connection, {{"error", "No api specified"}});
-                            return;
-                        }
 
-                        if(!_api_manager.hasApi(*api_name_it))
-                        {
-                            sendMessage(connection, {{"error", "Unsupported Api"}});
-                            return;
-                        }
-                        auto command_it = request.find(Api::COMMAND_FIELD);
-                        if(command_it == request.end())
-                        {
-                            sendMessage(connection, {{"error", "Command is not specified"}});
-                            return;
-                        }
 
-                        auto &api = _api_manager.api(*api_name_it);
+
+
+
+
+
+
 
                         if(!api.call(std::move(request),
                                      std::bind(&ServerType::sendMessage, this, connection, std::placeholders::_1)))){
@@ -78,7 +89,6 @@ private:
                     { //User not authorized, send message
                         sendMessage(connection, std::move(message));
                     }
-        );
     }
 
     void onClose(Impl::Connection connection)

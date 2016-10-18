@@ -5,6 +5,13 @@ set(SOURCE_FILES
         Api.cpp
         ApiManager.h
         ApiManager.cpp
-        Server.h ServerImpl.cpp ServerImpl.h User.cpp User.h)
+        Server.h
+        ServerImpl.cpp
+        ServerImpl.h
+        User.cpp
+        User.h
+        Db.h
+        Db.cpp
+        )
 
 add_library(game ${SOURCE_FILES})

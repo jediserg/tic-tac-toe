@@ -10,8 +10,18 @@
 class User
 {
 public:
-    using Ptr = std::shared_ptr<User>;
+    User() = default;
 
+    User(std::string name, bool is_bot = false);
+
+public:
+    const std::string &getName() const;
+
+    bool isBot() const;
+
+private:
+    std::string _name;
+    bool _is_bot;
 };
 
 

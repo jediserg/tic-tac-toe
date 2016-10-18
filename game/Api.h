@@ -5,16 +5,19 @@
 #ifndef TIC_TAC_TOE_API_H
 #define TIC_TAC_TOE_API_H
 
-#include <string>
-#include <map>
 #include <functional>
 #include <json.hpp>
+#include <map>
+#include <memory>
+#include <string>
+
+class User;
 
 class Api
 {
 public:
     using Callback = std::function<void (nlohmann::json&&)>;
-    using Handler = std::function<bool (nlohmann::json&&, Callback)>;
+    using Handler = std::function<bool(std::shared_ptr<User>, nlohmann::json &&, Callback)>;
     using Handlers = std::map<std::string, Handler>;
 
     Api(std::string name);
@@ -29,7 +32,7 @@ public:
     void enable();
     void disable();
 
-    bool call(nlohmann::json&& request, Callback callback) const;
+    bool call(std::shared_ptr<User> user, nlohmann::json &&request, Callback callback) const;
 
     const std::string& name() const;
 
