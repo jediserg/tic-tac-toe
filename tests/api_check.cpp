@@ -24,7 +24,7 @@ TEST(ApiCheck, TestBasicGetterSetters) {
 
 TEST(ApiCheck, TestHandlers) {
     Api api("1.0");
-    std::shared_ptr<User> test_user = std::make_shared<User>("Name");
+    std::shared_ptr<User> test_user = std::make_shared<User>(std::map<std::string, std::string>({{"name", "Name"}}));
 
     bool testComandCompleted = false;
 
@@ -74,7 +74,7 @@ TEST(ApiCheck, TestHandlers) {
 
 TEST(ApiCheck, TestDisabledHandler) {
     Api api("1.0");
-    std::shared_ptr<User> test_user = std::make_shared<User>("Name");
+    std::shared_ptr<User> test_user = std::make_shared<User>(std::map<std::string, std::string>({{"name", "User"}}));
 
     bool testComandCompleted = false;
 

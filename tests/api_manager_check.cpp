@@ -12,7 +12,7 @@ using namespace nlohmann;
 
 TEST(ApiManagerCheck, AddGetApi) {
     ApiManager api_manager;
-
+    api_manager.setSupportedApi({"1.0", "2.0"});
     //create api
     Api &api1 = api_manager.api("1.0");
     Api &api2 = api_manager.api("2.0");
@@ -34,18 +34,16 @@ TEST(ApiManagerCheck, AddGetApi) {
     EXPECT_TRUE(api_manager.supportApi("2.0"));
 
     EXPECT_FALSE(api_manager.supportApi("3.0"));
-
-
 }
 
 TEST(ApiManagerCheck, CallApi) {
     ApiManager api_manager;
-
+    api_manager.setSupportedApi({"1.0", "2.0"});
     //create api
-    auto api1 = api_manager.api("1.0");
-    auto api2 = api_manager.api("2.0");
+    auto &api1 = api_manager.api("1.0");
+    auto &api2 = api_manager.api("2.0");
 
-    std::shared_ptr<User> test_user = std::make_shared<User>("Name");
+    std::shared_ptr<User> test_user = std::make_shared<User>(std::map<std::string, std::string>({{"name", "User"}}));
 
     api1.setHandler("test", [](std::shared_ptr<User> user, json &&request, Api::Callback callback) {
         json response {

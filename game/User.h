@@ -6,22 +6,24 @@
 #define TIC_TAC_TOE_USER_H
 
 #include <memory>
+#include <map>
+#include "Validatable.h"
 
-class User
+class User : public Validatable
 {
 public:
-    User() = default;
-
-    User(std::string name, bool is_bot = false);
-
+    User(std::map<std::string, std::string> data);
 public:
     const std::string &getName() const;
-
-    bool isBot() const;
-
 private:
     std::string _name;
-    bool _is_bot;
+    std::string _password;
+    int _win_count;
+public:
+    int getWinCount() const;
+
+public:
+    const std::string &getPassword() const;
 };
 
 
