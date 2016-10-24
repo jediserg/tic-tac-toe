@@ -9,7 +9,7 @@
 #include <cppconn/statement.h>
 #include <mysql_driver.h>
 
-#include "Db.h"
+#include "Store.h"
 
 class DbFixture : public ::testing::Test
 {
@@ -76,7 +76,7 @@ private:
 
 TEST_F(DbFixture, CheckSaveLoad)
 {
-    Db db("localhost", "root", "testroot");
+    Store db("localhost", "root", "testroot");
     db.addSchema<TestClass>("test_class", "field1", {{"field1", &TestClass::getField1},
                                                      {"field2", &TestClass::getField2}});
 

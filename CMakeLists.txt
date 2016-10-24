@@ -8,6 +8,7 @@ set(SOURCE_FILES main.cpp)
 
 include_directories(3rdparty 3rdparty/json)
 
+add_subdirectory(3rdparty/mysql)
 add_subdirectory(game)
 add_subdirectory(tests)
 

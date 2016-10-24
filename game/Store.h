@@ -16,22 +16,12 @@
 #include <cppconn/connection.h>
 #include <mutex>
 #include <condition_variable>
+#include <iostream>
 
-namespace sql {
-    class Connection;
-};
-
-struct ConnectionWithInfo {
-
-    sql::Connection *connection;
-    bool isInUse;
-};
-
-class Db {
+template<class ConcreteStore>
+class Store {
 public:
     using Getter = std::function<std::string(void *)>;
-
-    Db(std::string host, std::string user, std::string password, size_t capacity = 4);
 
     template<class Model>
     void addSchema(std::string table, std::string id_field,
@@ -84,11 +74,11 @@ public:
         if(id_field.empty())
             throw std::invalid_argument(std::string("Model:" + model_name + " was not registered, id_field is empty"));
 
-        std::map<std::string, std::string> data = _loadData(table_name, id_field, keys);
+        std::map<std::string, std::string> data = _concrete_store.loadData(table_name, id_field, keys);
         return std::make_shared<Model>(std::move(data));
     }
 
-    void _saveData(std::string table_name, std::map<std::string, std::string> data);
+
 
     template<class Model>
     void save(Model &model)
@@ -109,25 +99,16 @@ public:
         for(auto &it: fields)
             data[it.first] = it.second(static_cast<void *>(&model));
 
-        _saveData(table_name, data);
+        _concrete_store.saveData(table_name, data);
     }
 private:
-    sql::Connection *getConnection();
-
-    void releaseConnection(sql::Connection *c);
-
-    std::map<std::string, std::string>
-    _loadData(std::string table, std::string id_field, std::vector<std::string> &fields);
+    ConcreteStore _concrete_store;
 
     std::map<std::string, std::string> _tables;
     std::map<std::string, std::string> _id_fields;
     std::map<std::string, std::vector<std::string>> _keys;
     std::map<std::string, std::map<std::string, Getter>> _models;
 
-    std::vector<ConnectionWithInfo> _connection_pool;
-
-    std::mutex _mutex;
-    std::condition_variable _connection_notify;
 };
 
 
