@@ -16,8 +16,6 @@
 #include <condition_variable>
 #include <iostream>
 
-class sql::Connection;
-
 namespace sql {
     class Connection;
 };
@@ -30,16 +28,9 @@ struct ConnectionWithInfo {
 
 class ConnectionPool {
 public:
-    ConnectionPool(std::string host, std::string user, std::string password, sts:;
+    ConnectionPool(std::string host, std::string user, std::string password, std::string database, size_t capacity = 4);
 
-    string database, size_t
-    capacity = 4
-    );
-
-    void releaseConnection(sql::Connection *c);
-
-    sql::Connection *getConnection();
-
+    std::shared_ptr<sql::Connection> getConnection();
 private:
     std::vector<ConnectionWithInfo> _connection_pool;
 

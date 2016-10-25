@@ -11,25 +11,30 @@
 #include <vector>
 #include <map>
 
-class ConnectionPool;
+#include "ConnectionPool.h"
 
 class DbStore {
 public:
     DbStore(std::string host, std::string user, std::string password, std::string database,
-            std::string pool_size);
+            int pool_size);
 
     std::map<std::string, std::string>
-    loadData(std::string table, std::string id_field, std::vector<std::string> &fields);
+    loadData(std::string table, std::string id_field, std::string id_value, std::vector<std::string> &fields);
 
     void saveData(std::string table_name, const std::map<std::string, std::string> &data);
 
+    void createTable(std::string table, std::string id_field, std::vector<std::string> fields);
+
+    void dropTable(std::string table);
 private:
     std::unique_ptr<ConnectionPool> _pool;
     std::string _host;
     std::string _user;
     std::string _password;
     std::string _database;
-    std::string _pool_size;
+    int _pool_size;
+
+
 };
 
 

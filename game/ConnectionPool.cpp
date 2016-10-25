@@ -2,7 +2,6 @@
 // Created by serg on 10/24/16.
 //
 
-#include "ConnectionPool.h.h"
 #include "ConnectionPool.h"
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
@@ -16,9 +15,10 @@ ConnectionPool::ConnectionPool(std::string host, std::string user, std::string p
     try {
         auto driver = sql::mysql::get_mysql_driver_instance();
 
-        for (auto c: _connection_pool) {
+        for (auto &c: _connection_pool) {
             c.isInUse = false;
             c.connection = driver->connect(_host, _user, _password);
+            c.connection->setSchema(database);
         }
     } catch (sql::SQLException &e) {
         std::cout << "Exception while creating Db object" << std::endl;
@@ -29,7 +29,7 @@ ConnectionPool::ConnectionPool(std::string host, std::string user, std::string p
     }
 }
 
-sql::Connection *ConnectionPool::getConnection() {
+std::shared_ptr<sql::Connection> ConnectionPool::getConnection() {
     std::unique_lock<std::mutex> lock(_mutex);
     sql::Connection *free_connection = nullptr;
 
@@ -43,20 +43,18 @@ sql::Connection *ConnectionPool::getConnection() {
         }
 
         if (free_connection == nullptr)
-            _connection_notify.wait(_mutex);
+            _connection_notify.wait(lock);
     }
 
-    if (free_connection->val)
+    if (free_connection->isValid())
+        return std::shared_ptr<sql::Connection>(free_connection, [this](sql::Connection *con) {
+            std::unique_lock<std::mutex> lock(_mutex);
 
-        return free_connection;
-}
-
-void ConnectionPool::releaseConnection(sql::Connection *c) {
-    for (auto &it: _connection_pool) {
-        if (it.connection == c) {
-            it.isInUse = false;
-        }
-    }
-
-    _connection_notify.notify_one();
+            for (auto &c: _connection_pool) {
+                if (c.connection == con) {
+                    c.isInUse = false;
+                    _connection_notify.notify_one();
+                }
+            }
+        });
 }

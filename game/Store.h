@@ -13,7 +13,7 @@
 #include <sstream>
 #include <map>
 #include <typeinfo>
-#include <cppconn/connection.h>
+
 #include <mutex>
 #include <condition_variable>
 #include <iostream>
@@ -23,12 +23,56 @@ class Store {
 public:
     using Getter = std::function<std::string(void *)>;
 
+    template<class... Args>
+    Store(Args ... args)
+            : _concrete_store(args...) {
+
+    }
+
     template<class Model>
-    void addSchema(std::string table, std::string id_field,
-                   std::map<std::string, std::function<std::string(Model *)>> fields)
+    void createTable() {
+        std::string model_name = typeid(Model).name();
+
+
+        auto &keys = _keys[model_name];
+
+        if (keys.empty())
+            throw std::invalid_argument(std::string("Model:" + model_name + " was not registered"));
+
+        std::string table_name = _tables[model_name];
+
+        if (table_name.empty())
+            throw std::invalid_argument(
+                    std::string("Model:" + model_name + " was not registered, table name is empty"));
+
+        std::string id_field = _id_fields[model_name];
+
+        if (id_field.empty())
+            throw std::invalid_argument(std::string("Model:" + model_name + " was not registered, id_field is empty"));
+
+        _concrete_store.createTable(table_name, id_field, keys);
+    }
+
+    template<class Model>
+    void dropTable() {
+        std::string model_name = typeid(Model).name();
+
+        std::string table_name = _tables[model_name];
+
+        if (table_name.empty())
+            throw std::invalid_argument(
+                    std::string("Model:" + model_name + " was not registered, table name is empty"));
+
+
+        _concrete_store.dropTable(table_name);
+    }
+
+    template<class Model>
+    void addTable(std::string table, std::string id_field,
+                  std::map<std::string, std::function<std::string(Model *)>> fields)
     {
         std::map<std::string, Getter> getters;
-        std::vector<std::string> keys(fields.size());
+        std::vector<std::string> keys;
         for(auto &field: fields)
         {
             keys.push_back(field.first);
@@ -48,7 +92,7 @@ public:
     {
         std::cout << "Add model:" << typeid(Model).name() << std::endl;
 
-        addSchema(id_field, typeid(Model).name(), std::move(fields));
+        addTable(id_field, typeid(Model).name(), std::move(fields));
     }
 
 
@@ -74,11 +118,9 @@ public:
         if(id_field.empty())
             throw std::invalid_argument(std::string("Model:" + model_name + " was not registered, id_field is empty"));
 
-        std::map<std::string, std::string> data = _concrete_store.loadData(table_name, id_field, keys);
+        std::map<std::string, std::string> data = _concrete_store.loadData(table_name, id_field, id, keys);
         return std::make_shared<Model>(std::move(data));
     }
-
-
 
     template<class Model>
     void save(Model &model)
@@ -110,6 +152,5 @@ private:
     std::map<std::string, std::map<std::string, Getter>> _models;
 
 };
-
 
 #endif //TIC_TAC_TOE_DB_H

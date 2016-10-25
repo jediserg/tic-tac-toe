@@ -6,9 +6,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(SOURCE_FILES main.cpp)
 
 
-include_directories(3rdparty 3rdparty/json)
+include_directories(3rdparty 3rdparty/json ../../dev/mysql/include 3rdparty/json)
+link_directories(../../dev/mysql/lib)
 
-add_subdirectory(3rdparty/mysql)
 add_subdirectory(game)
 add_subdirectory(tests)
 

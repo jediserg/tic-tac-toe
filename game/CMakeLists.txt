@@ -12,6 +12,8 @@ set(SOURCE_FILES
         User.h
         Store.h
         Store.cpp
-        Validatable.h DbStore.cpp)
+        Validatable.h
+        DbStore.cpp
+        ConnectionPool.cpp)
 
 add_library(game ${SOURCE_FILES})
