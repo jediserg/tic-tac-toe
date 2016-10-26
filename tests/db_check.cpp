@@ -9,8 +9,9 @@
 #include <cppconn/statement.h>
 #include <mysql_driver.h>
 #include <Validatable.h>
-#include <DbStore.h>
+#include <MysqlStorage.h>
 #include "FakeStore.h"
+#include "StoreInstance.h"
 
 #include "Store.h"
 
@@ -28,6 +29,7 @@ public:
         auto con = driver->connect(HOST, USER, PASSWORD);
         auto stmt = con->createStatement();
 
+        stmt->execute(std::string("DROP DATABASE IF EXISTS `") + DB + "`");
         stmt->execute(std::string("CREATE DATABASE IF NOT EXISTS `") + DB + "`");
 
         delete stmt;
@@ -89,7 +91,7 @@ private:
 
 TEST_F(DbFixture, CheckSaveLoad)
 {
-    Store<DbStore> db(HOST, USER, PASSWORD, DB, 4);
+    Store<MysqlStorage> db(HOST, USER, PASSWORD, DB, 4);
 
     db.addTable<TestClass>("test_class", "field1", {
             {"field1",    &TestClass::getField1},
@@ -103,6 +105,10 @@ TEST_F(DbFixture, CheckSaveLoad)
     db.save(obj);
 
     auto obj1 = db.load<TestClass>("value1");
+
+    EXPECT_EQ("value1", obj1->getField1());
+    EXPECT_EQ("value2", obj1->getField2());
+    EXPECT_EQ(42, obj1->getIntField());
 
     db.dropTable<TestClass>();
 }
@@ -123,4 +129,14 @@ TEST(CheckStore, CheckSaveLoadFromFakeDb) {
     EXPECT_EQ("value1", obj1->getField1());
     EXPECT_EQ("value2", obj1->getField2());
     EXPECT_EQ(42, obj1->getIntField());
+}
+
+TEST_F(DbFixture, CheckGettingStoreInstance)
+{
+    auto& store1 = getMysqlStore(HOST, USER, PASSWORD, DB, 4);
+    auto& store2 = getMysqlStore();
+    auto& store3 = getMysqlStore();
+
+    EXPECT_EQ(&store1, &store2);
+    EXPECT_EQ(&store1, &store3);
 }

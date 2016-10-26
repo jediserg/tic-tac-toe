@@ -9,6 +9,8 @@
 #include <json.hpp>
 #include "ApiManager.h"
 
+
+
 template<class Impl, class SessionManager>
 class Server
 {
@@ -64,31 +66,11 @@ private:
 
         auto &api = _api_manager.api(*api_name_it);
 
-        if (!api.call(_session_mgr.std::move(request),
-                      std::bind(&ServerType::sendMessage, this, connection, std::placeholders::_1)))){
-            sendMessage(connection, {{"error", "Unsupported command"}});
-        }
-                [connection](nlohmann::json &&response)
-                    { //User authorized, call command handler
+        _session_mgr.processRequest(std::move(request), std::bind(&ServerType::sendMessage, this, connection, std::placeholders::_1),
+                                    []( std::shared_ptr<User> user, nlohmann::json request, Api::Callback callback){
+            if(!api.call(user, std::move(request), callback))
 
-
-
-
-
-
-
-
-
-                        if(!api.call(std::move(request),
-                                     std::bind(&ServerType::sendMessage, this, connection, std::placeholders::_1)))){
-                    sendMessage(connection, {{"error", "Unsupported command"}});
-                }
-
-                    },
-                [connection](nlohmann::json &&message)
-                    { //User not authorized, send message
-                        sendMessage(connection, std::move(message));
-                    }
+        });
     }
 
     void onClose(Impl::Connection connection)

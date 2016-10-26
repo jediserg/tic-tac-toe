@@ -4,7 +4,7 @@
 
 #include <map>
 #include <vector>
-#include "DbStore.h"
+#include "MysqlStorage.h"
 #include <memory>
 #include "ConnectionPool.h"
 #include <cppconn/driver.h>
@@ -15,7 +15,7 @@
 #include <mysql_connection.h>
 #include <cppconn/prepared_statement.h>
 
-void DbStore::createTable(std::string table, std::string id_field, std::vector<std::string> fields) {
+void MysqlStorage::createTable(std::string table, std::string id_field, std::vector<std::string> fields) {
     auto connection = _pool->getConnection();
 
     std::stringstream query_stream;
@@ -39,7 +39,7 @@ void DbStore::createTable(std::string table, std::string id_field, std::vector<s
     stmt->execute(query_stream.str());
 }
 
-void DbStore::dropTable(std::string table) {
+void MysqlStorage::dropTable(std::string table) {
     auto connection = _pool->getConnection();
 
     std::stringstream query_stream;
@@ -50,12 +50,32 @@ void DbStore::dropTable(std::string table) {
 }
 
 std::map<std::string, std::string>
-DbStore::loadData(std::string table, std::string id_field, std::string id_value, std::vector<std::string> &fields) {
+MysqlStorage::loadData(std::string table, std::string id_field, std::string id_value, std::vector<std::string> &fields) {
     auto connection = _pool->getConnection();
-    return std::map<std::string, std::string>();
+
+    std::map<std::string, std::string> result;
+
+    std::stringstream query_stream;
+
+    query_stream << "SELECT * FROM `" << table << "` WHERE `" << id_field << "`=?";
+    std::string query = query_stream.str();
+
+    std::unique_ptr<sql::PreparedStatement> prepared_stmt(connection->prepareStatement(query));
+    prepared_stmt->setString(1, id_value);
+
+    std::unique_ptr<sql::ResultSet> query_result(prepared_stmt->executeQuery());
+
+    if(!query_result->next())
+        return result;
+
+    for(auto& field:fields){
+        result[field] = query_result->getString(field);
+    }
+
+    return result;
 }
 
-void DbStore::saveData(std::string table_name, const std::map<std::string, std::string> &data) {
+void MysqlStorage::saveData(std::string table_name, const std::map<std::string, std::string> &data) {
     auto connection = _pool->getConnection();
 
     std::stringstream query_stream;
@@ -75,7 +95,7 @@ void DbStore::saveData(std::string table_name, const std::map<std::string, std::
 
         query_stream << '`' << field.first << '`';
         insert_values_stream << '?';
-        update_values_stream << '`' << field.first << "`=`" << field.second << '`';
+        update_values_stream << '`' << field.first << "`=" << '?';
 
     }
     query_stream << ") VALUES (";
@@ -88,16 +108,13 @@ void DbStore::saveData(std::string table_name, const std::map<std::string, std::
 
     for (auto &field: data) {
         prepared_stmt->setString(field_counter, field.second);
-        prepared_stmt->setString(field_counter + data.size(), field.second);
+        prepared_stmt->setString(field_counter++ + data.size(), field.second);
     }
 
-    bool res = prepared_stmt->execute();
-
-    if (!res)
-        throw std::runtime_error("Error while saving data");
+    prepared_stmt->execute();
 }
 
-DbStore::DbStore(std::string host, std::string user, std::string password, std::string database,
+MysqlStorage::MysqlStorage(std::string host, std::string user, std::string password, std::string database,
                  int pool_size)
         : _pool(new ConnectionPool(host, user, password, database, pool_size)), _host(host), _user(user),
           _password(password), _database(database), _pool_size(pool_size) {}

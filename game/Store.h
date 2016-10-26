@@ -143,6 +143,11 @@ public:
 
         _concrete_store.saveData(table_name, data);
     }
+
+    std::map<std::string, std::string>& getTables()
+    {
+        return _tables;
+    };
 private:
     ConcreteStore _concrete_store;
 
@@ -150,7 +155,6 @@ private:
     std::map<std::string, std::string> _id_fields;
     std::map<std::string, std::vector<std::string>> _keys;
     std::map<std::string, std::map<std::string, Getter>> _models;
-
 };
 
 #endif //TIC_TAC_TOE_DB_H

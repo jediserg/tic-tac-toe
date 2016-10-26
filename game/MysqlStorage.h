@@ -13,9 +13,9 @@
 
 #include "ConnectionPool.h"
 
-class DbStore {
+class MysqlStorage {
 public:
-    DbStore(std::string host, std::string user, std::string password, std::string database,
+    MysqlStorage(std::string host, std::string user, std::string password, std::string database,
             int pool_size);
 
     std::map<std::string, std::string>
