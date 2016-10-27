@@ -6,8 +6,8 @@
 
 
 Api::Api(std::string name)
-    :   _is_enabled(true),
-        _name(std::move(name)){
+        : _is_enabled(true),
+          _name(std::move(name)) {
 }
 
 bool Api::isEnabled() const {
@@ -23,17 +23,17 @@ void Api::disable() {
 }
 
 bool Api::call(std::shared_ptr<User> user, nlohmann::json &&request, Callback callback) const {
-    if(!_is_enabled)
+    if (!_is_enabled)
         return false;
 
     auto command = request.find(COMMAND_FIELD);
 
-    if(command == request.end())
+    if (command == request.end())
         return false;
 
     auto handler = _handlers.find(*command);
 
-    if(handler == _handlers.end())
+    if (handler == _handlers.end())
         return false;
 
     return handler->second(user, std::move(request), callback);

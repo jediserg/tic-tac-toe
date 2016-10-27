@@ -6,19 +6,15 @@
 #define TIC_TAC_TOE_VALIDATABLE_H
 
 
-class Validatable
-{
+class Validatable {
 public:
-    Validatable() : _is_valid(false)
-    {}
+    Validatable() : _is_valid(false) {}
 
     virtual ~Validatable() = default;
 
-    bool isValid()
-    { return _is_valid; }
+    bool isValid() { return _is_valid; }
 
-    void setValid(bool is_valid)
-    { _is_valid = is_valid; }
+    void setValid(bool is_valid) { _is_valid = is_valid; }
 
 private:
     bool _is_valid;

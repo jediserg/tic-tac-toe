@@ -4,7 +4,6 @@
 
 #include <gtest/gtest.h>
 #include <cppconn/driver.h>
-#include <cppconn/exception.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 #include <mysql_driver.h>
@@ -13,18 +12,14 @@
 #include "FakeStore.h"
 #include "StoreInstance.h"
 
-#include "Store.h"
-
-class DbFixture : public ::testing::Test
-{
+class DbFixture : public ::testing::Test {
 public:
     static constexpr const char *HOST = "localhost";
     static constexpr const char *USER = "root";
     static constexpr const char *PASSWORD = "root";
     static constexpr const char *DB = "test-game-db";
 
-    DbFixture()
-    {
+    DbFixture() {
         auto driver = sql::mysql::get_mysql_driver_instance();
         auto con = driver->connect(HOST, USER, PASSWORD);
         auto stmt = con->createStatement();
@@ -38,8 +33,7 @@ public:
         std::cout << "Test db created" << std::endl;
     }
 
-    ~DbFixture()
-    {
+    ~DbFixture() {
         auto driver = sql::mysql::get_mysql_driver_instance();
         auto con = driver->connect(HOST, USER, PASSWORD);
         auto stmt = con->createStatement();
@@ -55,11 +49,9 @@ public:
 private:
 };
 
-class TestClass : public Validatable
-{
+class TestClass : public Validatable {
 public:
-    TestClass(std::map<std::string, std::string> data)
-    {
+    TestClass(std::map<std::string, std::string> data) {
         field1 = data["field1"];
         field2 = data["field2"];
         try {
@@ -69,19 +61,18 @@ public:
         }
     }
 
-    std::string getField1()
-    {
+    std::string getField1() {
         return field1;
     }
 
-    std::string getField2()
-    {
+    std::string getField2() {
         return field2;
     }
 
     int getIntField() {
         return int_field;
     }
+
 private:
     std::string field1;
     std::string field2;
@@ -89,8 +80,7 @@ private:
     int int_field;
 };
 
-TEST_F(DbFixture, CheckSaveLoad)
-{
+TEST_F(DbFixture, CheckSaveLoad) {
     Store<MysqlStorage> db(HOST, USER, PASSWORD, DB, 4);
 
     db.addTable<TestClass>("test_class", "field1", {
@@ -131,11 +121,10 @@ TEST(CheckStore, CheckSaveLoadFromFakeDb) {
     EXPECT_EQ(42, obj1->getIntField());
 }
 
-TEST_F(DbFixture, CheckGettingStoreInstance)
-{
-    auto& store1 = getMysqlStore(HOST, USER, PASSWORD, DB, 4);
-    auto& store2 = getMysqlStore();
-    auto& store3 = getMysqlStore();
+TEST_F(DbFixture, CheckGettingStoreInstance) {
+    auto &store1 = getMysqlStore(HOST, USER, PASSWORD, DB, 4);
+    auto &store2 = getMysqlStore();
+    auto &store3 = getMysqlStore();
 
     EXPECT_EQ(&store1, &store2);
     EXPECT_EQ(&store1, &store3);

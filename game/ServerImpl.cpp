@@ -2,8 +2,6 @@
 // Created by serg on 10/15/16.
 //
 
-#include "ServerImpl.h"
-
 /*ServerImpl::ServerImpl()
 {
     // Set logging settings

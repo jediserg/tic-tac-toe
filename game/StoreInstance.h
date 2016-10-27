@@ -10,6 +10,8 @@
 
 using MysqlStore = Store<MysqlStorage>;
 
-MysqlStore& getMysqlStore(std::string host = "", std::string user = "", std::string password = "", std::string database = "", int pool_size = 0);
+MysqlStore &
+getMysqlStore(std::string host = "", std::string user = "", std::string password = "", std::string database = "",
+              int pool_size = 0);
 
 #endif //TIC_TAC_TOE_STOREINSTANCE_H_H

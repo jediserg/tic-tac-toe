@@ -9,8 +9,7 @@
 #include <map>
 #include "Validatable.h"
 
-class User : public Validatable
-{
+class User : public Validatable {
 public:
     User(std::map<std::string, std::string> data);
 
@@ -19,6 +18,7 @@ public:
     const std::string &getPassword() const;
 
     int getWinCount() const;
+
 private:
     std::string _name;
     std::string _password;

@@ -31,6 +31,7 @@ public:
     ConnectionPool(std::string host, std::string user, std::string password, std::string database, size_t capacity = 4);
 
     std::shared_ptr<sql::Connection> getConnection();
+
 private:
     std::vector<ConnectionWithInfo> _connection_pool;
 

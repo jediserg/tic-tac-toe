@@ -15,8 +15,7 @@
 #include <StoreInstance.h>
 
 template<typename Connection, typename Comparation = std::less<Connection>>
-class SessionManager
-{
+class SessionManager {
 public:
     using Callback = std::function<void(nlohmann::json &&)>
     using ConnectionsMap = std::map<Connection, std::shared_ptr<User>, Comparation>;
@@ -64,49 +63,52 @@ public:
         callback({{Api::COMMAND_FIELD, "userCreated"}});
     }
 
-    void onLoginRequest(Connection c, nlohmann::json &&json,
-                        Api::Callback callback) {
-        auto name = json.find(USER_NAME_FIELD);
-        auto password = json.find(USER_NAME_FIELD);
-
-        if (name == json.end() || password == json.end())
-            return callback({{ERROR_FIELD, "Wrong login or password"}});
-
-        std::string str_name = *name;
-        std::string str_password = *password;
-
-        if (str_name.empty() || str_password.empty())
-            return callback({{ERROR_FIELD, "Wrong login or password"}});
-
-        try {
-            auto user = getMysqlStore().load<User>("name");
-
-            if (user->getPassword() == str_password)
-                _connections[c] = user;
-        } catch (const std::exception &e) {
-            std::cout << "Couldn't create user:" << e.what();
-            callback({{ERROR_FIELD, "Couldn't create User"}});
-            return;
-        } catch (...) {
-            std::cout << "Couldn't create user";
-            callback({{ERROR_FIELD, "Couldn't create User"}});
-            return;
-        }
-
-        callback({{Api::COMMAND_FIELD, "loggedIn"}});
-    }
-
-    void processRequest(Connection connection, nlohmann::json &&request, ProcessRequest callback) {
+    void processRequest(Connection connection, nlohmann::json &&request, Api::Callback response, ProcessRequest next) {
         auto it = _connections.find(connection);
 
         if (it == _connections.end())
-            callback(nullptr, std::move(request));
-        else
-            callback(it->second)
+            throw std::runtime_error("Connection not exists");
+
+        std::string command = request[Api::COMMAND_FIELD];
+
+        if (command == LOGIN_COMMAND) {
+            auto name = request.find(USER_NAME_FIELD);
+            auto password = request.find(USER_NAME_FIELD);
+
+            if (name == request.end() || password == request.end())
+                return response({{ERROR_FIELD, "Wrong login or password"}});
+
+            std::string str_name = *name;
+            std::string str_password = *password;
+
+            if (str_name.empty() || str_password.empty())
+                return response({{ERROR_FIELD, "Wrong login or password"}});
+
+            try {
+                auto user = getMysqlStore().load<User>("name");
+
+                if (user->getPassword() == str_password)
+                    _connections[connection] = user;
+            } catch (const std::exception &e) {
+                std::cout << "Couldn't create user:" << e.what();
+                response({{ERROR_FIELD, "Couldn't create User"}});
+                return;
+            } catch (...) {
+                std::cout << "Couldn't create user";
+                response({{ERROR_FIELD, "Couldn't create User"}});
+                return;
+            }
+
+            response({{Api::COMMAND_FIELD, "loggedIn"}});
+        } else {
+            if (it.second)
+                next(nullptr, std::move(request));
+            else
+                next(it.second, std::move(request));
+        }
     }
 
-    void newConnection(Connection connection)
-    {
+    void newConnection(Connection connection) {
         auto it = _connections.find(connection);
 
         if (it != _connections.end())
@@ -115,8 +117,7 @@ public:
         _connections[connection] = nullptr;
     }
 
-    void closeConnection(Connection connection)
-    {
+    void closeConnection(Connection connection) {
         _connections.erase(connection);
     }
 

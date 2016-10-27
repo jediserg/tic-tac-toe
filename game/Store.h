@@ -69,17 +69,14 @@ public:
 
     template<class Model>
     void addTable(std::string table, std::string id_field,
-                  std::map<std::string, std::function<std::string(Model *)>> fields)
-    {
+                  std::map<std::string, std::function<std::string(Model *)>> fields) {
         std::map<std::string, Getter> getters;
         std::vector<std::string> keys;
-        for(auto &field: fields)
-        {
+        for (auto &field: fields) {
             keys.push_back(field.first);
-            getters[field.first] = [field](void *model)
-                {
-                    return field.second(static_cast<Model *>(model));
-                };
+            getters[field.first] = [field](void *model) {
+                return field.second(static_cast<Model *>(model));
+            };
         }
         _keys.insert({typeid(Model).name(), std::move(keys)});
         _models.insert({typeid(Model).name(), std::move(getters)});
@@ -88,8 +85,7 @@ public:
     }
 
     template<class Model>
-    void addSchema(std::string id_field, std::map<std::string, std::function<std::string(Model *)>> fields)
-    {
+    void addSchema(std::string id_field, std::map<std::string, std::function<std::string(Model *)>> fields) {
         std::cout << "Add model:" << typeid(Model).name() << std::endl;
 
         addTable(id_field, typeid(Model).name(), std::move(fields));
@@ -97,25 +93,24 @@ public:
 
 
     template<class Model>
-    std::shared_ptr<Model> load(std::string id)
-    {
+    std::shared_ptr<Model> load(std::string id) {
         std::string model_name = typeid(Model).name();
 
 
         auto &keys = _keys[model_name];
 
-        if(keys.empty())
+        if (keys.empty())
             throw std::invalid_argument(std::string("Model:" + model_name + " was not registered"));
 
         std::string table_name = _tables[model_name];
 
-        if(table_name.empty())
+        if (table_name.empty())
             throw std::invalid_argument(
                     std::string("Model:" + model_name + " was not registered, table name is empty"));
 
         std::string id_field = _id_fields[model_name];
 
-        if(id_field.empty())
+        if (id_field.empty())
             throw std::invalid_argument(std::string("Model:" + model_name + " was not registered, id_field is empty"));
 
         std::map<std::string, std::string> data = _concrete_store.loadData(table_name, id_field, id, keys);
@@ -123,29 +118,27 @@ public:
     }
 
     template<class Model>
-    void save(const Model &model)
-    {
+    void save(const Model &model) {
         std::string model_name = typeid(Model).name();
         auto fields = _models[model_name];
 
-        if(fields.empty())
+        if (fields.empty())
             throw std::invalid_argument(std::string("Model:" + model_name + " was not registered"));
 
         std::string table_name = _tables[model_name];
 
-        if(table_name.empty())
+        if (table_name.empty())
             throw std::invalid_argument(
                     std::string("Model:" + model_name + " was not registered, table name is empty"));
 
         std::map<std::string, std::string> data;
-        for(auto &it: fields)
+        for (auto &it: fields)
             data[it.first] = it.second(static_cast<void *>(&model));
 
         _concrete_store.saveData(table_name, data);
     }
 
-    std::map<std::string, std::string>& getTables()
-    {
+    std::map<std::string, std::string> &getTables() {
         return _tables;
     };
 private:

@@ -3,10 +3,8 @@
 //
 
 #include "ApiManager.h"
-#include <json.hpp>
 
-Api &ApiManager::api(const std::string &name)
-{
+Api &ApiManager::api(const std::string &name) {
     return _api_map.at(name);
 }
 
@@ -17,11 +15,11 @@ bool ApiManager::supportApi(std::string name) noexcept {
 bool ApiManager::callApi(std::shared_ptr<User> user, nlohmann::json &&request, Api::Callback callback) const noexcept {
     auto api_name = request.find(API_FIELD);
 
-    if(api_name == request.end())
+    if (api_name == request.end())
         return false;
 
     ApiMap::const_iterator api_it = _api_map.find(*api_name);
-    if(api_it == _api_map.end())
+    if (api_it == _api_map.end())
         return false;
 
     return api_it->second.call(user, std::move(request), callback);

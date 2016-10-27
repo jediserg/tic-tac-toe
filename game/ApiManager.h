@@ -34,6 +34,7 @@ public:
     static ApiManager &get();
 
     static const ApiManager &get_const();
+
 private:
     ApiMap _api_map;
 };

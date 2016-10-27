@@ -13,10 +13,9 @@
 
 class User;
 
-class Api
-{
+class Api {
 public:
-    using Callback = std::function<void (nlohmann::json&&)>;
+    using Callback = std::function<void(nlohmann::json &&)>;
     using Handler = std::function<bool(std::shared_ptr<User>, nlohmann::json &&, Callback)>;
     using Handlers = std::map<std::string, Handler>;
 
@@ -29,16 +28,18 @@ public:
     Api &operator=(const Api &) = delete;
 
     bool isEnabled() const;
+
     void enable();
+
     void disable();
 
     bool call(std::shared_ptr<User> user, nlohmann::json &&request, Callback callback) const;
 
-    const std::string& name() const;
+    const std::string &name() const;
 
-    void setHandler(const std::string& command, Handler handler);
+    void setHandler(const std::string &command, Handler handler);
 
-    static constexpr const char* COMMAND_FIELD = "command";
+    static constexpr const char *COMMAND_FIELD = "command";
 private:
     bool _is_enabled;
     Handlers _handlers;

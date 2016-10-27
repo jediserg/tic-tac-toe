@@ -4,7 +4,6 @@
 
 #include <gtest/gtest.h>
 #include <json.hpp>
-#include <memory>
 #include "ApiManager.h"
 #include "User.h"
 
@@ -46,8 +45,8 @@ TEST(ApiManagerCheck, CallApi) {
     std::shared_ptr<User> test_user = std::make_shared<User>(std::map<std::string, std::string>({{"name", "User"}}));
 
     api1.setHandler("test", [](std::shared_ptr<User> user, json &&request, Api::Callback callback) {
-        json response {
-               {"result", "OK"}
+        json response{
+                {"result", "OK"}
         };
 
         callback(std::move(response));
@@ -56,19 +55,19 @@ TEST(ApiManagerCheck, CallApi) {
 
     });
 
-    json no_api_request {
+    json no_api_request{
             {"command", "test"},
-            {"param", "test"}
+            {"param",   "test"}
     };
 
     EXPECT_FALSE(api_manager.callApi(test_user, std::move(no_api_request), [](json &&response) {
         FAIL();
     }));
 
-    json bad_api_request {
-            {"api", "3.0"},
+    json bad_api_request{
+            {"api",     "3.0"},
             {"command", "test"},
-            {"param", "test"}
+            {"param",   "test"}
     };
 
     EXPECT_FALSE(api_manager.callApi(test_user, std::move(bad_api_request), [](json &&response) {
@@ -76,12 +75,11 @@ TEST(ApiManagerCheck, CallApi) {
     }));
 
 
-    json good_request {
-            {"api", "1.0"},
+    json good_request{
+            {"api",              "1.0"},
             {Api::COMMAND_FIELD, "test"},
-            {"param", "param"}
+            {"param",            "param"}
     };
-    EXPECT_TRUE(api_manager.callApi(test_user, std::move(good_request), [](json &&response) {
-        ;
+    EXPECT_TRUE(api_manager.callApi(test_user, std::move(good_request), [](json &&response) { ;
     }));
 }

@@ -16,7 +16,7 @@
 class MysqlStorage {
 public:
     MysqlStorage(std::string host, std::string user, std::string password, std::string database,
-            int pool_size);
+                 int pool_size);
 
     std::map<std::string, std::string>
     loadData(std::string table, std::string id_field, std::string id_value, std::vector<std::string> &fields);
@@ -26,6 +26,7 @@ public:
     void createTable(std::string table, std::string id_field, std::vector<std::string> fields);
 
     void dropTable(std::string table);
+
 private:
     std::unique_ptr<ConnectionPool> _pool;
     std::string _host;

@@ -36,8 +36,7 @@ std::shared_ptr<sql::Connection> ConnectionPool::getConnection() {
     while (free_connection == nullptr) {
         for (auto &c: _connection_pool) {
             if (!c.isInUse) {
-                if(c.connection->isClosed())
-                {
+                if (c.connection->isClosed()) {
                     c.connection = sql::mysql::get_driver_instance()->connect(_host, _user, _password);
                     c.connection->setSchema(_database);
                 }

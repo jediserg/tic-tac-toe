@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 
 
-TEST(ServerCheck, TestName)
-{
+TEST(ServerCheck, TestName) {
     //Server
 }

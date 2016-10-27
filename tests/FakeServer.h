@@ -10,13 +10,11 @@
 #include <functional>
 #include <map>
 
-class FakeServer
-{
+class FakeServer {
 public:
     using Connection = int;
 
-    struct ConnectionInfo
-    {
+    struct ConnectionInfo {
         ConnectionInfo();
 
         ConnectionInfo(Connection c);

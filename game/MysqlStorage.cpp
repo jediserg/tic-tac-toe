@@ -5,8 +5,6 @@
 #include <map>
 #include <vector>
 #include "MysqlStorage.h"
-#include <memory>
-#include "ConnectionPool.h"
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
 #include <cppconn/resultset.h>
@@ -50,7 +48,8 @@ void MysqlStorage::dropTable(std::string table) {
 }
 
 std::map<std::string, std::string>
-MysqlStorage::loadData(std::string table, std::string id_field, std::string id_value, std::vector<std::string> &fields) {
+MysqlStorage::loadData(std::string table, std::string id_field, std::string id_value,
+                       std::vector<std::string> &fields) {
     auto connection = _pool->getConnection();
 
     std::map<std::string, std::string> result;
@@ -65,10 +64,10 @@ MysqlStorage::loadData(std::string table, std::string id_field, std::string id_v
 
     std::unique_ptr<sql::ResultSet> query_result(prepared_stmt->executeQuery());
 
-    if(!query_result->next())
+    if (!query_result->next())
         return result;
 
-    for(auto& field:fields){
+    for (auto &field:fields) {
         result[field] = query_result->getString(field);
     }
 
@@ -115,6 +114,6 @@ void MysqlStorage::saveData(std::string table_name, const std::map<std::string, 
 }
 
 MysqlStorage::MysqlStorage(std::string host, std::string user, std::string password, std::string database,
-                 int pool_size)
+                           int pool_size)
         : _pool(new ConnectionPool(host, user, password, database, pool_size)), _host(host), _user(user),
           _password(password), _database(database), _pool_size(pool_size) {}
