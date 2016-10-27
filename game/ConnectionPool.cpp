@@ -36,6 +36,12 @@ std::shared_ptr<sql::Connection> ConnectionPool::getConnection() {
     while (free_connection == nullptr) {
         for (auto &c: _connection_pool) {
             if (!c.isInUse) {
+                if(c.connection->isClosed())
+                {
+                    c.connection = sql::mysql::get_driver_instance()->connect(_host, _user, _password);
+                    c.connection->setSchema(_database);
+                }
+
                 free_connection = c.connection;
                 c.isInUse = true;
                 break;
@@ -46,15 +52,14 @@ std::shared_ptr<sql::Connection> ConnectionPool::getConnection() {
             _connection_notify.wait(lock);
     }
 
-    if (free_connection->isValid())
-        return std::shared_ptr<sql::Connection>(free_connection, [this](sql::Connection *con) {
-            std::unique_lock<std::mutex> lock(_mutex);
+    return std::shared_ptr<sql::Connection>(free_connection, [this](sql::Connection *con) {
+        std::unique_lock<std::mutex> lock(_mutex);
 
-            for (auto &c: _connection_pool) {
-                if (c.connection == con) {
-                    c.isInUse = false;
-                    _connection_notify.notify_one();
-                }
+        for (auto &c: _connection_pool) {
+            if (c.connection == con) {
+                c.isInUse = false;
+                _connection_notify.notify_one();
             }
-        });
+        }
+    });
 }
