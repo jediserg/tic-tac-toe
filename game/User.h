@@ -13,17 +13,16 @@ class User : public Validatable
 {
 public:
     User(std::map<std::string, std::string> data);
-public:
+
     const std::string &getName() const;
+
+    const std::string &getPassword() const;
+
+    int getWinCount() const;
 private:
     std::string _name;
     std::string _password;
     int _win_count;
-public:
-    int getWinCount() const;
-
-public:
-    const std::string &getPassword() const;
 };
 
 

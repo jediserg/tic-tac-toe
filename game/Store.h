@@ -123,7 +123,7 @@ public:
     }
 
     template<class Model>
-    void save(Model &model)
+    void save(const Model &model)
     {
         std::string model_name = typeid(Model).name();
         auto fields = _models[model_name];

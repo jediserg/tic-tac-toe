@@ -66,11 +66,11 @@ private:
 
         auto &api = _api_manager.api(*api_name_it);
 
-        _session_mgr.processRequest(std::move(request), std::bind(&ServerType::sendMessage, this, connection, std::placeholders::_1),
-                                    []( std::shared_ptr<User> user, nlohmann::json request, Api::Callback callback){
-            if(!api.call(user, std::move(request), callback))
+        using namespace std::placeholders;
 
-        });
+        _session_mgr.processRequest(connection, std::move(request), std::bind(&Api::call, api, _1, _2,
+                                                                              std::bind(&ServerType::sendMessage, this,
+                                                                                        connection, _1)));
     }
 
     void onClose(Impl::Connection connection)
