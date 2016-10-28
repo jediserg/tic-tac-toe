@@ -5,11 +5,14 @@
 #include "User.h"
 #include <iostream>
 
-User::User(std::map<std::string, std::string> data) {
+User::User(std::map<std::string, std::string> data) : _win_count(0) {
     try {
         _name = data["name"];
-        if (data.find("win_count") != data.end())
-            _win_count = std::stoi(data["win_count"]);
+        _password = data["password"];
+        if (data.find("win_count") != data.end()) {
+            auto temp = data["win_count"];
+            _win_count = std::stoi(temp);
+        }
 
         setValid(true);
     } catch (std::exception &e) {

@@ -21,7 +21,7 @@
 template<class ConcreteStore>
 class Store {
 public:
-    using Getter = std::function<std::string(void *)>;
+    using Getter = std::function<std::string(const void *)>;
 
     template<class... Args>
     Store(Args ... args)
@@ -69,13 +69,13 @@ public:
 
     template<class Model>
     void addTable(std::string table, std::string id_field,
-                  std::map<std::string, std::function<std::string(Model *)>> fields) {
+                  std::map<std::string, std::function<std::string(const Model *)>> fields) {
         std::map<std::string, Getter> getters;
         std::vector<std::string> keys;
         for (auto &field: fields) {
             keys.push_back(field.first);
-            getters[field.first] = [field](void *model) {
-                return field.second(static_cast<Model *>(model));
+            getters[field.first] = [field](const void *model) {
+                return field.second(static_cast<const Model *>(model));
             };
         }
         _keys.insert({typeid(Model).name(), std::move(keys)});
@@ -85,7 +85,7 @@ public:
     }
 
     template<class Model>
-    void addSchema(std::string id_field, std::map<std::string, std::function<std::string(Model *)>> fields) {
+    void addSchema(std::string id_field, std::map<std::string, std::function<std::string(const Model *)>> fields) {
         std::cout << "Add model:" << typeid(Model).name() << std::endl;
 
         addTable(id_field, typeid(Model).name(), std::move(fields));
@@ -133,7 +133,7 @@ public:
 
         std::map<std::string, std::string> data;
         for (auto &it: fields)
-            data[it.first] = it.second(static_cast<void *>(&model));
+            data[it.first] = it.second(static_cast<const void *>(&model));
 
         _concrete_store.saveData(table_name, data);
     }

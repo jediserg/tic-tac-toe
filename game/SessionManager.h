@@ -17,7 +17,7 @@
 template<typename Connection, typename Comparation = std::less<Connection>>
 class SessionManager {
 public:
-    using Callback = std::function<void(nlohmann::json &&)>
+    using Callback = std::function<void(nlohmann::json &&)>;
     using ConnectionsMap = std::map<Connection, std::shared_ptr<User>, Comparation>;
     using ProcessRequest = std::function<void(std::shared_ptr<User>, nlohmann::json &&)>;
 
@@ -31,10 +31,10 @@ public:
     SessionManager() {
     }
 
-    void onRegisterRequest(std::shared_ptr<User> user, nlohmann::json &&json,
+    void onRegisterRequest(nlohmann::json &&json,
                            Api::Callback callback) {
         auto name = json.find(USER_NAME_FIELD);
-        auto password = json.find(USER_NAME_FIELD);
+        auto password = json.find(USER_PASSWORD_FIELD);
 
         if (name == json.end() || password == json.end())
             return callback({{ERROR_FIELD, "Wrong login or password"}});
@@ -47,8 +47,9 @@ public:
 
         try {
             getMysqlStore().save(User({
-                                              {"name",     str_name},
-                                              {"password", str_password}
+                                              {"name",      str_name},
+                                              {"password",  str_password},
+                                              {"win_count", "0"},
                                       }));
         } catch (const std::exception &e) {
             std::cout << "Couldn't create user:" << e.what();
@@ -101,10 +102,10 @@ public:
 
             response({{Api::COMMAND_FIELD, "loggedIn"}});
         } else {
-            if (it.second)
+            if (it->second)
                 next(nullptr, std::move(request));
             else
-                next(it.second, std::move(request));
+                next(it->second, std::move(request));
         }
     }
 
@@ -129,7 +130,6 @@ public:
 
         return it->second;
     }
-
 private:
     ConnectionsMap _connections;
 };

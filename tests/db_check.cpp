@@ -3,51 +3,13 @@
 //
 
 #include <gtest/gtest.h>
-#include <cppconn/driver.h>
-#include <cppconn/resultset.h>
-#include <cppconn/statement.h>
-#include <mysql_driver.h>
+
 #include <Validatable.h>
 #include <MysqlStorage.h>
 #include "FakeStore.h"
 #include "StoreInstance.h"
+#include "DbFixture.h"
 
-class DbFixture : public ::testing::Test {
-public:
-    static constexpr const char *HOST = "localhost";
-    static constexpr const char *USER = "root";
-    static constexpr const char *PASSWORD = "root";
-    static constexpr const char *DB = "test-game-db";
-
-    DbFixture() {
-        auto driver = sql::mysql::get_mysql_driver_instance();
-        auto con = driver->connect(HOST, USER, PASSWORD);
-        auto stmt = con->createStatement();
-
-        stmt->execute(std::string("DROP DATABASE IF EXISTS `") + DB + "`");
-        stmt->execute(std::string("CREATE DATABASE IF NOT EXISTS `") + DB + "`");
-
-        delete stmt;
-        delete con;
-
-        std::cout << "Test db created" << std::endl;
-    }
-
-    ~DbFixture() {
-        auto driver = sql::mysql::get_mysql_driver_instance();
-        auto con = driver->connect(HOST, USER, PASSWORD);
-        auto stmt = con->createStatement();
-
-        stmt->execute(std::string("DROP DATABASE `") + DB + "`");
-
-        delete stmt;
-        delete con;
-
-        std::cout << "Test db droped" << std::endl;
-    }
-
-private:
-};
 
 class TestClass : public Validatable {
 public:
@@ -61,15 +23,15 @@ public:
         }
     }
 
-    std::string getField1() {
+    std::string getField1() const{
         return field1;
     }
 
-    std::string getField2() {
+    std::string getField2() const {
         return field2;
     }
 
-    int getIntField() {
+    int getIntField() const {
         return int_field;
     }
 
@@ -86,7 +48,7 @@ TEST_F(DbFixture, CheckSaveLoad) {
     db.addTable<TestClass>("test_class", "field1", {
             {"field1",    &TestClass::getField1},
             {"field2",    &TestClass::getField2},
-            {"int_field", [](TestClass *obj) { return std::to_string(obj->getIntField()); }}
+            {"int_field", [](const TestClass *obj) { return std::to_string(obj->getIntField()); }}
     });
 
     db.createTable<TestClass>();
@@ -109,7 +71,7 @@ TEST(CheckStore, CheckSaveLoadFromFakeDb) {
     db.addTable<TestClass>("test_class", "field1", {
             {"field1",    &TestClass::getField1},
             {"field2",    &TestClass::getField2},
-            {"int_field", [](TestClass *obj) { return std::to_string(obj->getIntField()); }}
+            {"int_field", [](const TestClass *obj) { return std::to_string(obj->getIntField()); }}
     });
 
     TestClass obj{{{"field1", "value1"}, {"field2", "value2"}, {"int_field", "42"}}};
