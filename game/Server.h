@@ -10,12 +10,12 @@
 #include "ApiManager.h"
 
 
-template<class Impl, class SessionManager>
+template<class Impl, class SM>
 class Server {
 public:
-    using Connection = Impl::Connection;
-    using Compare    = Impl::Compare;
-    using ServerType = Server<Impl, SessionManager>;
+    using Connection = typename Impl::Connection;
+    using Compare    = typename Impl::Compare;
+    typedef Server<Impl, SM> ServerType;
 
     Server(ApiManager &api_manager, uint16_t port) : _impl(port), _api_manager(api_manager) {}
 
@@ -34,11 +34,11 @@ public:
     }
 
 private:
-    void onNewConnection(Impl::Connection connection) {
+    void onNewConnection(Connection connection) {
         _session_mgr.newConnection(connection);
     }
 
-    void onMessage(Impl::Connection connection, nlohmann::json request) {
+    void onMessage(Connection connection, nlohmann::json request) {
         auto api_name_it = request.find(ApiManager::API_FIELD);
 
         if (api_name_it == request.end()) {
@@ -67,18 +67,18 @@ private:
                                                                                  connection, _1)));
     }
 
-    void onClose(Impl::Connection connection) {
+    void onClose(Connection connection) {
         _session_mgr.closeConnection(connection);
     }
 
-    void sendMessage(Impl::Connection connection, nlohmann::json message) {
+    void sendMessage(Connection connection, nlohmann::json message) {
         std::string json_message(message.dump());
 
         _impl.sendMessage(connection, std::move(json_message));
     }
 
     Impl _impl;
-    SessionManager _session_mgr;
+    SM _session_mgr;
     ApiManager &_api_manager;
 };
 

@@ -13,6 +13,7 @@
 class FakeServer {
 public:
     using Connection = int;
+    using Compare = std::less<int>;
 
     struct ConnectionInfo {
         ConnectionInfo();
