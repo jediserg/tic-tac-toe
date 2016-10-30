@@ -102,6 +102,11 @@ public:
 
             response({{Api::COMMAND_FIELD, "loggedIn"}});
         } else {
+            if (command == REGISTER_COMMAND) {
+                onRegisterRequest(std::move(request), response);
+                return;
+            }
+
             if (it->second)
                 next(nullptr, std::move(request));
             else

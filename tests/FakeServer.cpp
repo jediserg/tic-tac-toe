@@ -4,8 +4,8 @@
 
 #include "FakeServer.h"
 
-FakeServer::FakeServer(uint16_t port)
-        : _port(port), _is_run(false) {}
+FakeServer::FakeServer()
+        : _is_run(false) {}
 
 void FakeServer::run() {
     _is_run = true;
@@ -29,7 +29,12 @@ void FakeServer::newConnection(FakeServer::Connection connection) {
 }
 
 void FakeServer::gotMessage(FakeServer::Connection connection, std::string message) {
-    _message_handler(connection, std::move(message));
+    auto &info = _connections.at(connection);
+
+    if (info.is_open) {
+        info.last_in_message = message;
+        _message_handler(connection, std::move(message));
+    }
 }
 
 void FakeServer::closeConnection(FakeServer::Connection connection) {

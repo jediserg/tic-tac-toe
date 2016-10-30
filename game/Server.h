@@ -17,7 +17,7 @@ public:
     using Compare    = typename Impl::Compare;
     typedef Server<Impl, SM> ServerType;
 
-    Server(ApiManager &api_manager, uint16_t port) : _impl(port), _api_manager(api_manager) {}
+    Server(ApiManager &api_manager, Impl &impl) : _impl(impl), _api_manager(api_manager) {}
 
     Server(const Server &) = delete;
 
@@ -38,7 +38,9 @@ private:
         _session_mgr.newConnection(connection);
     }
 
-    void onMessage(Connection connection, nlohmann::json request) {
+    void onMessage(Connection connection, std::string &&message) {
+        auto request = nlohmann::json::parse(message);
+
         auto api_name_it = request.find(ApiManager::API_FIELD);
 
         if (api_name_it == request.end()) {
@@ -62,22 +64,25 @@ private:
 
         using namespace std::placeholders;
 
-        _session_mgr.processRequest(connection, std::move(request), std::bind(&ServerType::sendMessage, this, _1),
-                                    std::bind(&Api::call, api, _1, _2, std::bind(&ServerType::sendMessage, this,
-                                                                                 connection, _1)));
+        _session_mgr.processRequest(connection, std::move(request),
+                                    std::bind(&ServerType::sendMessage, this, connection, _1),
+                                    [connection, &api, this](std::shared_ptr<User> user, nlohmann::json &&request) {
+                                        api.call(user, std::move(request),
+                                                 std::bind(&ServerType::sendMessage, this, connection, _1));
+                                    });
     }
 
     void onClose(Connection connection) {
         _session_mgr.closeConnection(connection);
     }
 
-    void sendMessage(Connection connection, nlohmann::json message) {
+    void sendMessage(Connection connection, nlohmann::json &&message) {
         std::string json_message(message.dump());
 
         _impl.sendMessage(connection, std::move(json_message));
     }
 
-    Impl _impl;
+    Impl &_impl;
     SM _session_mgr;
     ApiManager &_api_manager;
 };

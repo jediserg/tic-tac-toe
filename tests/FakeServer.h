@@ -32,7 +32,7 @@ public:
     using MessageHandler = std::function<void(Connection, std::string &&)>;
     using CloseHandler = std::function<void(Connection)>;
 
-    FakeServer(uint16_t port);
+    FakeServer();
 
     void run();
 
@@ -50,7 +50,6 @@ public:
 
     void closeConnection(Connection connection);
 
-    uint16_t _port;
     bool _is_run;
 
     NewConnectionHandler _new_connection_handler;
