@@ -1,6 +1,12 @@
-//
-// Created by serg on 10/18/16.
-//
+/*!
+ * \brief It's a very simple and easy to use ORM.
+ *
+ * ConcreteStorage is a template strategy responsable for a data storage in specific place
+ * (in a mysql: MysqlStorage or in a memory FakeStorage )
+ * To use this class we have to add tabless using addTable. It binds a data model classes to a table. See tests/db_check.cpp
+ * All data models must have a constructor with std::map<string, string> (field name, field value) and getters for all fields
+ * Than we can use save, load, createTable, dropTable just using data model class as template parameter.
+ */
 
 #ifndef TIC_TAC_TOE_DB_H
 #define TIC_TAC_TOE_DB_H

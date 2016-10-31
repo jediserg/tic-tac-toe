@@ -1,6 +1,6 @@
-//
-// Created by serg on 10/15/16.
-//
+/*!
+ * \brief General class that process incomming messages usin Impl strategy to work with different protocols
+ */
 
 #ifndef TIC_TAC_TOE_SERVER_H
 #define TIC_TAC_TOE_SERVER_H

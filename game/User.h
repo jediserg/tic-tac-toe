@@ -1,6 +1,6 @@
-//
-// Created by serg on 10/16/16.
-//
+/*!
+ * Simple model class to work with Store
+ */
 
 #ifndef TIC_TAC_TOE_USER_H
 #define TIC_TAC_TOE_USER_H

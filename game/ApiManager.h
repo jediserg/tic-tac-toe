@@ -1,6 +1,10 @@
-//
-// Created by serg on 10/13/16.
-//
+/*!
+ * \brief A set of different version of API we should support
+ *
+ * Some times we have to support different version of APIs (old versions, different clients, etc) so this class stores
+ * different versions of APIs. ApiManager has a method to add a command to all supported APIs.
+ * \todo add support to link on old APIs method from the new one and export a subset of an API to another API.
+ */
 
 #ifndef TIC_TAC_TOE_APIMANAGER_H
 #define TIC_TAC_TOE_APIMANAGER_H

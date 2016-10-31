@@ -6,8 +6,8 @@ set(SOURCE_FILES
         ApiManager.h
         ApiManager.cpp
         Server.h
-        ServerImpl.cpp
-        ServerImpl.h
+        WSServerImpl.cpp
+        WSServerImpl.h
         User.cpp
         User.h
         Store.h

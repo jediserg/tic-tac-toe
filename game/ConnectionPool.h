@@ -1,6 +1,10 @@
-//
-// Created by serg on 10/24/16.
-//
+/*!
+ * \brief It is a connection pool for mysql db.
+ *
+ * We borrow a connection using a getConnection method, which returns shared_ptr on mysql connection whith custom
+ * deleter, because we don't delete a connection we just mark it as unused and reuse it. If all the connections is in use
+ * the method will block current thread until one connection will be marked as unused.
+ */
 
 #ifndef TIC_TAC_TOE_CONNECTIONPOOL_H
 #define TIC_TAC_TOE_CONNECTIONPOOL_H

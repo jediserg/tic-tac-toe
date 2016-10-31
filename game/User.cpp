@@ -5,7 +5,7 @@
 #include "User.h"
 #include <iostream>
 
-User::User(std::map<std::string, std::string> data) : _win_count(0) {
+User::User(std::map<std::string, std::string> data) : _win_count(0), Validatable() {
     try {
         _name = data["name"];
         _password = data["password"];

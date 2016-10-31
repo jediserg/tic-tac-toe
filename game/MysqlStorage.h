@@ -1,6 +1,9 @@
-//
-// Created by serg on 10/24/16.
-//
+/*!
+ *\brief It's a strategy class can be sent as a template parameter to the Store class.
+ *
+ * This class can save/load data(as a field to value map, both can be only string,
+ * but values could be converted to other types latter) to/from a table.
+ */
 
 #ifndef TIC_TAC_TOE_READER_H
 #define TIC_TAC_TOE_READER_H

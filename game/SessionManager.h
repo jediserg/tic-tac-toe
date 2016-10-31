@@ -1,6 +1,6 @@
-//
-// Created by serg on 10/16/16.
-//
+/*!
+ * \brief This class is owned by the Server and response for a simple user registration/login
+ */
 
 #ifndef TIC_TAC_TOE_SESSIONMANAGER_H
 #define TIC_TAC_TOE_SESSIONMANAGER_H
