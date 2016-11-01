@@ -14,6 +14,6 @@ set(SOURCE_FILES
         Store.cpp
         Validatable.h
         MysqlStorage.cpp
-        ConnectionPool.cpp StoreInstance.h StoreInstance.cpp)
+        ConnectionPool.cpp StoreInstance.h StoreInstance.cpp ThreadPool.cpp ThreadPool.h)
 
 add_library(game ${SOURCE_FILES})
