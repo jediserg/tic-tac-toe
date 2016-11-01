@@ -44,3 +44,8 @@ void ThreadPool::stop() {
 bool ThreadPool::isStopped() const {
     return _stopped;
 }
+
+ThreadPool &ThreadPool::getInstance(size_t size) {
+    static ThreadPool _pool(size);
+    return _pool;
+}
