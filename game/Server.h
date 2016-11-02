@@ -48,7 +48,7 @@ private:
             return;
         }
 
-        if (!_api_manager.supportApi(*api_name_it)) {
+        if (!_api_manager.isApiSupported(*api_name_it)) {
             sendMessage(connection, {{"error", "Unsupported Api"}});
             return;
         }

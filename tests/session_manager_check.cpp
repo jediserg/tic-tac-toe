@@ -17,6 +17,8 @@ TEST_F(DbFixture, TestUserRegister) {
 
     db.createTable<User>();
 
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
     SessionManager<int> sm;
 
     sm.onRegisterRequest({{"name", "UserName"}, {"password", "test"}}, [](nlohmann::json&& response){
@@ -44,7 +46,11 @@ TEST_F(DbFixture, TestUserLogin) {
 
     db.createTable<User>();
 
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
     db.save(User({{"name", "UserName"}, {"password", "test"}, {"win_count", "1"}}));
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
     SessionManager<int> sm;
     sm.newConnection(1);

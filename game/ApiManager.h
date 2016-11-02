@@ -27,7 +27,7 @@ public:
 
     Api &api(const std::string &name);
 
-    bool supportApi(std::string name) noexcept;
+    bool isApiSupported(std::string name) noexcept;
 
     bool callApi(std::shared_ptr<User> user, nlohmann::json &&request, Api::Callback callback) const noexcept;
 

@@ -6,14 +6,13 @@
 #include <vector>
 #include "MysqlStorage.h"
 #include <cppconn/driver.h>
-#include <cppconn/exception.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 #include <mysql_driver.h>
 #include <mysql_connection.h>
 #include <cppconn/prepared_statement.h>
 
-void MysqlStorage::createTable(std::string table, std::string id_field, std::vector<std::string> fields) {
+void MysqlStorage::createTable(std::string table, std::string id_field, std::vector<std::string> fields) const {
     auto connection = _pool->getConnection();
 
     std::stringstream query_stream;
@@ -37,7 +36,7 @@ void MysqlStorage::createTable(std::string table, std::string id_field, std::vec
     stmt->execute(query_stream.str());
 }
 
-void MysqlStorage::dropTable(std::string table) {
+void MysqlStorage::dropTable(std::string table) const {
     auto connection = _pool->getConnection();
 
     std::stringstream query_stream;
@@ -49,7 +48,7 @@ void MysqlStorage::dropTable(std::string table) {
 
 std::map<std::string, std::string>
 MysqlStorage::loadData(std::string table, std::string id_field, std::string id_value,
-                       std::vector<std::string> &fields) {
+                       const std::vector<std::string> &fields) const {
     auto connection = _pool->getConnection();
 
     std::map<std::string, std::string> result;
@@ -64,6 +63,8 @@ MysqlStorage::loadData(std::string table, std::string id_field, std::string id_v
 
     std::unique_ptr<sql::ResultSet> query_result(prepared_stmt->executeQuery());
 
+    std::cout << query_stream.str() << ", " << id_value << std::endl;
+
     if (!query_result->next())
         return result;
 
@@ -74,7 +75,7 @@ MysqlStorage::loadData(std::string table, std::string id_field, std::string id_v
     return result;
 }
 
-void MysqlStorage::saveData(std::string table_name, const std::map<std::string, std::string> &data) {
+void MysqlStorage::saveData(std::string table_name, const std::map<std::string, std::string> &data) const {
     auto connection = _pool->getConnection();
 
     std::stringstream query_stream;

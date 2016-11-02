@@ -22,13 +22,14 @@ public:
                  int pool_size);
 
     std::map<std::string, std::string>
-    loadData(std::string table, std::string id_field, std::string id_value, std::vector<std::string> &fields);
+    loadData(std::string table, std::string id_field, std::string id_value,
+             const std::vector<std::string> &fields) const;
 
-    void saveData(std::string table_name, const std::map<std::string, std::string> &data);
+    void saveData(std::string table_name, const std::map<std::string, std::string> &data) const;
 
-    void createTable(std::string table, std::string id_field, std::vector<std::string> fields);
+    void createTable(std::string table, std::string id_field, std::vector<std::string> fields) const;
 
-    void dropTable(std::string table);
+    void dropTable(std::string table) const;
 
 private:
     std::unique_ptr<ConnectionPool> _pool;

@@ -17,12 +17,13 @@ public:
     using Tables = std::map<std::string, Table>;
 
     Record
-    loadData(std::string table_name, std::string id_field, std::string id_value, std::vector<std::string> &fields);
+    loadData(std::string table_name, std::string id_field, std::string id_value,
+             const std::vector<std::string> &fields) const;
 
-    void saveData(std::string table_name, const Record &data);
+    void saveData(std::string table_name, const Record &data) const;
 
 private:
-    Tables _tables;
+    mutable Tables _tables;
 };
 
 

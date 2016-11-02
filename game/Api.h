@@ -47,7 +47,7 @@ public:
     static constexpr const char *COMMAND_FIELD = "command";
 private:
     bool _is_enabled;
-    //All handlers must be set up before server start, so after we have readonly access to the map, so it shoud be thread-safe
+    //All handlers must be set up before server start, so after we have readonly access to the map, so it's thread-safe
     Handlers _handlers;
     std::string _name;
 };

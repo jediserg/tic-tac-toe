@@ -5,8 +5,8 @@
 #include "FakeStore.h"
 
 FakeStore::Record FakeStore::loadData(std::string table_name, std::string id_field, std::string id_value,
-                                      std::vector<std::string> &fields) {
-    auto table = _tables[table_name];
+                                      const std::vector<std::string> &fields) const {
+    auto table = _tables.at(table_name);
 
     if (table.empty())
         return Record();
@@ -19,6 +19,6 @@ FakeStore::Record FakeStore::loadData(std::string table_name, std::string id_fie
     return std::map<std::string, std::string>();
 }
 
-void FakeStore::saveData(std::string table_name, const FakeStore::Record &data) {
+void FakeStore::saveData(std::string table_name, const FakeStore::Record &data) const {
     _tables[table_name].push_back(data);
 }

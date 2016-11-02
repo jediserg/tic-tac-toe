@@ -34,7 +34,7 @@ public:
     }
 
     void onRegisterRequest(nlohmann::json &&json,
-                           Api::Callback callback) {
+                           Api::Callback callback) const {
         auto name = json.find(USER_NAME_FIELD);
         auto password = json.find(USER_PASSWORD_FIELD);
 
@@ -156,7 +156,7 @@ public:
     }
 private:
     ConnectionsMap _connections;
-    std::mutex _mutex;
+    mutable std::mutex _mutex;
 };
 
 

@@ -29,10 +29,10 @@ TEST(ApiManagerCheck, AddGetApi) {
     EXPECT_FALSE(api_manager.api("1.0").isEnabled());
     EXPECT_FALSE(api_manager.api("2.0").isEnabled());
 
-    EXPECT_TRUE(api_manager.supportApi("1.0"));
-    EXPECT_TRUE(api_manager.supportApi("2.0"));
+    EXPECT_TRUE(api_manager.isApiSupported("1.0"));
+    EXPECT_TRUE(api_manager.isApiSupported("2.0"));
 
-    EXPECT_FALSE(api_manager.supportApi("3.0"));
+    EXPECT_FALSE(api_manager.isApiSupported("3.0"));
 }
 
 TEST(ApiManagerCheck, CallApi) {

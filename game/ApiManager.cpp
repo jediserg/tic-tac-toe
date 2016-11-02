@@ -8,7 +8,7 @@ Api &ApiManager::api(const std::string &name) {
     return _api_map.at(name);
 }
 
-bool ApiManager::supportApi(std::string name) noexcept {
+bool ApiManager::isApiSupported(std::string name) noexcept {
     return _api_map.find(std::move(name)) != _api_map.end();
 }
 
