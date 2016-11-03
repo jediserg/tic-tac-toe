@@ -77,9 +77,17 @@ private:
     }
 
     void sendMessage(Connection connection, nlohmann::json &&message) {
-        std::string json_message(message.dump());
-
-        _impl.sendMessage(connection, std::move(json_message));
+        try {
+            std::string json_message = message.dump();
+            _impl.sendMessage(connection, std::move(json_message));
+        } catch (const std::invalid_argument &e) {
+            std::cout << e.what() << std::endl;
+        }
+        catch (const std::exception &e) {
+            std::cout << e.what() << std::endl;
+        } catch (...) {
+            std::cout << "Couldn't parse json" << std::endl;
+        }
     }
 
     Impl &_impl;

@@ -13,7 +13,7 @@ class WSServerImpl
 {
 public:
     using WsServer = SimpleWeb::SocketServer<SimpleWeb::WS>;
-    using Connection = WsServer::Connection;
+    using Connection = std::shared_ptr<WsServer::Connection>;
 
     using NewConnectionHandler = std::function<void(Connection)>;
     using MessageHandler = std::function<void(Connection, std::string &&)>;
@@ -23,7 +23,21 @@ public:
 
     void run();
 
+    void setOnNewConnection(NewConnectionHandler handler);
+
+    void setOnMessage(MessageHandler handler);
+
+    void setOnClose(CloseHandler handler);
+
+    void sendMessage(Connection connection, std::string &&message);
+
+    void closeConnection(Connection connection);
+
 private:
+    NewConnectionHandler _new_connection_handler;
+    MessageHandler _message_handler;
+    CloseHandler _close_handler;
+
     WsServer _server;
 };
 

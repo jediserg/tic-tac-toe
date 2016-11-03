@@ -24,13 +24,20 @@ public:
 
     bool isStopped() const;
 
+    void waitForTasks();
+
+    size_t getActiveTaskCount() const;
+
+
     static ThreadPool &getInstance(size_t size = 4);
 private:
 
     std::queue<TaskProc> _queue;
-    std::mutex _mutex;
+    mutable std::mutex _mutex;
     std::condition_variable _queue_notify;
+    std::condition_variable _task_count_notify;
     bool _stopped;
+    size_t _active_task_count;
 };
 
 #endif //TIC_TAC_TOE_THREADPOOL_H

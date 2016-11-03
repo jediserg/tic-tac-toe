@@ -39,3 +39,31 @@ TEST(ThreadPoolTests, TestTasks) {
        break;
    }
 }
+
+char *test_data = NULL;
+
+TEST(ThreadPoolTests, WaitForTasks) {
+    try {
+        ThreadPool pool(90);
+
+        const size_t TASK_COUNT = 20000;
+
+        char tasks_complete[TASK_COUNT] = {0};
+        test_data = tasks_complete;
+
+        for (int i = 0; i < TASK_COUNT; i++)
+            pool.addTask([&tasks_complete, i]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+                tasks_complete[i] = 1;
+            });
+
+        //EXPECT_EQ(TASK_COUNT, pool.getActiveTaskCount());
+
+        pool.waitForTasks();
+
+        EXPECT_EQ(0, pool.getActiveTaskCount());
+    } catch (const std::exception &e) {
+        std::cout << "Exception:" << e.what() << std::endl;
+    }
+}
