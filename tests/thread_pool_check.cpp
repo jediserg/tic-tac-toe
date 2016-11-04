@@ -13,12 +13,15 @@ TEST(ThreadPoolTests, SimpleChecks) {
     pool.stop();
 
     EXPECT_TRUE(pool.isStopped());
+
+    std::cout << "=============" << std::endl;
+
 }
 
 TEST(ThreadPoolTests, TestTasks) {
     ThreadPool pool(7);
 
-    const size_t TASK_COUNT = 1000;
+    const size_t TASK_COUNT = 100;
 
     char tasks_complete[TASK_COUNT] = {0};
 
@@ -29,15 +32,11 @@ TEST(ThreadPoolTests, TestTasks) {
             tasks_complete[i] = 1;
         });
 
-   while(true){
-       for(int i = 0; i < TASK_COUNT; ++i){
-           if(tasks_complete[i] == 0) {
-               std::this_thread::sleep_for(std::chrono::milliseconds(10));
-               continue;
-           }
-       }
-       break;
-   }
+    pool.waitForTasks();
+
+    for (int i = 0; i < TASK_COUNT; i++) {
+        EXPECT_EQ(1, tasks_complete[i]);
+    }
 }
 
 char *test_data = NULL;

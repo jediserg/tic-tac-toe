@@ -6,7 +6,7 @@
 #include <cassert>
 #include <iostream>
 
-ThreadPool::ThreadPool(size_t N) : _stopped(false), _active_task_count(0)
+ThreadPool::ThreadPool(size_t N) : _stopped(false), _active_task_count(0), _run_threads_count(N)
 {
     for(int i = 0; i < N; i++){
         std::thread([this](){
@@ -25,16 +25,21 @@ ThreadPool::ThreadPool(size_t N) : _stopped(false), _active_task_count(0)
                         _active_task_count--;
                     }
 
-                    if(_stopped)
+                    if (_stopped) {
+                        _run_threads_count--;
                         break;
+                    }
 
                     if (_queue.empty())
-                        _queue_notify.wait(lock);
-
-                    if (!_queue.empty())
-                        assert(false);
+                        _queue_notify.wait(lock, [this]() { return !_queue.empty() || _stopped; });
 
 
+                    if (_stopped) {
+                        _run_threads_count--;
+                        break;
+                    }
+
+                    assert(!_queue.empty());
 
                     task = _queue.front();
                     _queue.pop();
@@ -42,7 +47,7 @@ ThreadPool::ThreadPool(size_t N) : _stopped(false), _active_task_count(0)
                 try {
                     task();
                 } catch (std::exception &e) {
-                    std::cout << "-Exception:" << e.what() << std::endl;
+                    std::cout << "Exception:" << e.what() << std::endl;
                 }
             }
         }).detach();
@@ -55,6 +60,7 @@ void ThreadPool::addTask(ThreadPool::TaskProc task) {
     std::unique_lock<std::mutex> lock(_mutex);
 
     _queue.push(task);
+
     _active_task_count++;
 
     _queue_notify.notify_one();
@@ -67,6 +73,18 @@ void ThreadPool::stop() {
     _stopped = true;
 
     _queue_notify.notify_all();
+
+
+    while (_run_threads_count != 0) {
+        lock.unlock();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+        lock.lock();
+    }
+
+
+    lock.unlock();
 }
 
 bool ThreadPool::isStopped() const {
@@ -85,9 +103,14 @@ size_t ThreadPool::getActiveTaskCount() const {
 }
 
 void ThreadPool::waitForTasks() {
+    std::unique_lock<std::mutex> lock(_mutex);
     while (_active_task_count != 0) {
-        std::unique_lock<std::mutex> lock(_mutex);
+        lock.unlock();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+        lock.lock();
     }
+
+    lock.unlock();
 }

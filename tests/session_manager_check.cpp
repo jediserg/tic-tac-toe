@@ -17,6 +17,8 @@ TEST_F(DbFixture, TestUserRegister) {
 
     db.createTable<User>();
 
+    ThreadPool::getInstance().waitForTasks();
+
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     SessionManager<int> sm;
@@ -27,7 +29,10 @@ TEST_F(DbFixture, TestUserRegister) {
         EXPECT_EQ(response[Api::COMMAND_FIELD], "userCreated");
     });
 
+    ThreadPool::getInstance().waitForTasks();
+
     auto user = db.load<User>("UserName");
+
     EXPECT_TRUE((bool)user);
 
     EXPECT_EQ("UserName", user->getName());
@@ -55,7 +60,7 @@ TEST_F(DbFixture, TestUserLogin) {
     SessionManager<int> sm;
     sm.newConnection(1);
     sm.processRequest(1, {{Api::COMMAND_FIELD, "login"},
-                          {"name",             "UserName"},
+                          {"login",            "UserName"},
                           {"password",         "test"}}, [](nlohmann::json &&response) {
         EXPECT_TRUE(response.end() == response.find("error"));
         EXPECT_EQ(response[Api::COMMAND_FIELD], "loggedIn");

@@ -38,6 +38,7 @@ private:
     std::condition_variable _task_count_notify;
     bool _stopped;
     size_t _active_task_count;
+    size_t _run_threads_count;
 };
 
 #endif //TIC_TAC_TOE_THREADPOOL_H

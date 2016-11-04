@@ -17,6 +17,9 @@ TEST_F(DbFixture, TestServer) {
     });
 
     db.createTable<User>();
+
+    ThreadPool::getInstance().waitForTasks();
+
     ApiManager api_manager;
 
     api_manager.setSupportedApi({"1.0", "1.2", "1.3"});
@@ -54,8 +57,9 @@ TEST_F(DbFixture, TestServer) {
 
     fakeServer.gotMessage(1, register_msg);
 
-    nlohmann::json response_register = nlohmann::json::parse(connection->second.last_out_message);
+    ThreadPool::getInstance().waitForTasks();
 
+    nlohmann::json response_register = nlohmann::json::parse(connection->second.last_out_message);
 
     EXPECT_TRUE(connection->second.is_open);
 
@@ -69,7 +73,10 @@ TEST_F(DbFixture, TestServer) {
 "login":"UserLogin",
 "password":"123456"
 })STR");
-
+    ThreadPool::getInstance().waitForTasks();
     nlohmann::json response_login = nlohmann::json::parse(connection->second.last_out_message);
+
+    std::cout << response_login << std::endl;
+
     EXPECT_EQ(response_login["command"], "loggedIn");
 }

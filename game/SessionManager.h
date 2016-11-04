@@ -27,6 +27,7 @@ public:
     static constexpr const char *LOGIN_COMMAND = "login";
 
     static constexpr const char *USER_NAME_FIELD = "name";
+    static constexpr const char *USER_LOGIN_FIELD = "login";
     static constexpr const char *ERROR_FIELD = "error";
     static constexpr const char *USER_PASSWORD_FIELD = "password";
 
@@ -80,14 +81,16 @@ public:
 
         std::string command = request[Api::COMMAND_FIELD];
 
-        if (command == LOGIN_COMMAND) {
-            auto name = request.find(USER_NAME_FIELD);
-            auto password = request.find(USER_NAME_FIELD);
+        std::cout << request << std::endl;
 
-            if (name == request.end() || password == request.end())
+        if (command == LOGIN_COMMAND) {
+            auto login = request.find(USER_LOGIN_FIELD);
+            auto password = request.find(USER_PASSWORD_FIELD);
+
+            if (login == request.end() || password == request.end())
                 return response({{ERROR_FIELD, "Wrong login or password"}});
 
-            std::string str_name = *name;
+            std::string str_name = *login;
             std::string str_password = *password;
 
             if (str_name.empty() || str_password.empty())

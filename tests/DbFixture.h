@@ -15,7 +15,7 @@ class DbFixture : public ::testing::Test {
 public:
     static constexpr const char *HOST = "localhost";
     static constexpr const char *USER = "root";
-    static constexpr const char *PASSWORD = "root";
+    static constexpr const char *PASSWORD = "testroot";
     static constexpr const char *DB = "test-game-db";
 
     DbFixture() {
