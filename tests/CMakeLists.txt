@@ -9,4 +9,4 @@ add_executable(game_tests
         api_check.cpp
         api_manager_check.cpp FakeServer.cpp FakeServer.h ../game/SessionManager.h db_check.cpp FakeStore.cpp FakeStore.h session_manager_check.cpp DbFixture.h server_check.cpp thread_pool_check.cpp)
 
-target_link_libraries(game_tests gtest gtest_main game mysqlcppconn)
+target_link_libraries(game_tests boost_log gtest gtest_main game mysqlcppconn)

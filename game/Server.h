@@ -8,6 +8,7 @@
 #include <functional>
 #include <json.hpp>
 #include "ApiManager.h"
+#include "log.h"
 
 
 template<class Impl, class SM>
@@ -26,6 +27,7 @@ public:
     Server &operator=(const Server &) = delete;
 
     void run() {
+        LOG_DEBUG << "Start server";
         _impl.setOnNewConnection(std::bind(&ServerType::onNewConnection, this, std::placeholders::_1));
         _impl.setOnClose(std::bind(&ServerType::onClose, this, std::placeholders::_1));
         _impl.setOnMessage(std::bind(&ServerType::onMessage, this, std::placeholders::_1, std::placeholders::_2));
@@ -35,6 +37,7 @@ public:
 
 private:
     void onNewConnection(Connection connection) {
+        LOG_DEBUG << "New connection";
         _session_mgr.newConnection(connection);
     }
 

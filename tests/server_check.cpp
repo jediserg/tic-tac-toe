@@ -1,6 +1,7 @@
 //
 // Created by serg on 10/28/16.
 //
+#define BOOST_LOG_DYN_LINK 1
 #include <gtest/gtest.h>
 #include "Server.h"
 #include "FakeServer.h"
