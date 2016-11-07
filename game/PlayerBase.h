@@ -14,15 +14,13 @@ class Board;
 class PlayerBase {
 public:
     //Player should make a move after this command
-    void yourTurn(Board &&) = 0;
+    virtual void yourTurn(Board &&) = 0;
 
-    void onMove(std::function<void(std::Position &&)> on_move) { _on_move = on_move; }
+    void onMove(std::function<void(unsigned long, unsigned long)> on_move) { _on_move = on_move; }
 
-    void makeMove(std::Position &&position) { _on_move(std::move(position)); }
-
+    void makeMove(unsigned long row, unsigned long column) { _on_move(row, column); }
 private:
-    std::function<void(std::Position &&)>)
-    _on_move;
+    std::function<void(unsigned long, unsigned long)> _on_move;
 };
 
 
