@@ -13,6 +13,7 @@ class Board;
 
 class PlayerBase {
 public:
+    PlayerBase
     //Player should make a move after this command
     virtual void yourTurn(Board &&) = 0;
 

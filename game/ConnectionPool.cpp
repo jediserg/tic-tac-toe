@@ -3,8 +3,8 @@
 //
 
 #include "ConnectionPool.h"
+#include "log.h"
 #include <cppconn/driver.h>
-#include <cppconn/exception.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 #include <mysql_driver.h>
@@ -21,10 +21,8 @@ ConnectionPool::ConnectionPool(std::string host, std::string user, std::string p
             c.connection->setSchema(database);
         }
     } catch (sql::SQLException &e) {
-        std::cout << "Exception while creating Db object" << std::endl;
-        std::cout << "Err:" << e.what() << " (MySQL error code:" << e.getErrorCode();
-        std::cout << ", SQLState: " << e.getSQLState() << " )" << std::endl;
-
+        LOG_ERROR << "Exception while creating Db object. " << "Err:" << e.what() <<
+                  " (MySQL error code:" << e.getErrorCode() << ", SQLState: " << e.getSQLState() << " )";
         exit(1);
     }
 }

@@ -84,12 +84,26 @@ private:
             std::string json_message = message.dump();
             _impl.sendMessage(connection, std::move(json_message));
         } catch (const std::invalid_argument &e) {
-            std::cout << e.what() << std::endl;
+            LOG_ERROR << e.what();
         }
         catch (const std::exception &e) {
-            std::cout << e.what() << std::endl;
+            LOG_ERROR << e.what();
         } catch (...) {
-            std::cout << "Couldn't parse json" << std::endl;
+            LOG_ERROR << "Couldn't parse json";
+        }
+    }
+
+    void sendMessageToUser(const std::string &user_name, nlohmann::json &&message) {
+        try {
+            auto connection = _session_mgr.getUserConnection(user_name);
+            sendMessage(connection, std::move(message));
+        } catch (const std::invalid_argument &e) {
+            LOG_ERROR << e.what();
+        }
+        catch (const std::exception &e) {
+            LOG_ERROR << e.what();
+        } catch (...) {
+            LOG_ERROR << "Couldn't parse json";
         }
     }
 

@@ -3,7 +3,7 @@
 //
 
 #include "User.h"
-#include <iostream>
+#include "log.h"
 
 User::User(std::map<std::string, std::string> data) : _win_count(0), Validatable() {
     try {
@@ -16,7 +16,7 @@ User::User(std::map<std::string, std::string> data) : _win_count(0), Validatable
 
         setValid(true);
     } catch (std::exception &e) {
-        std::cout << "Bad arguments for User:" << e.what() << std::endl;
+        LOG_ERROR << "Bad arguments for User:" << e.what();
         setValid(false);
     }
 }

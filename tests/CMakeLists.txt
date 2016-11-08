@@ -1,5 +1,7 @@
 project(tests)
 
+add_definitions(-DBOOST_LOG_DYN_LINK=1)
+
 add_subdirectory(lib/gtest)
 
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})

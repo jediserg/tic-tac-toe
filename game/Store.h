@@ -23,6 +23,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <iostream>
+#include "log.h"
 
 template<class ConcreteStore>
 class Store {
@@ -97,7 +98,7 @@ public:
 
     template<class Model>
     void addSchema(std::string id_field, std::map<std::string, std::function<std::string(const Model *)>> fields) {
-        std::cout << "Add model:" << typeid(Model).name() << std::endl;
+        LOG_DEBUG << "Add model:" << typeid(Model).name() << std::endl;
 
         addTable(id_field, typeid(Model).name(), std::move(fields));
     }
@@ -109,6 +110,8 @@ public:
 
         std::map<std::string, std::string> data = _concrete_store.loadData(model.table, model.id_field, id,
                                                                            model.fields);
+        if (data.empty())
+            return nullptr;
 
         return std::make_shared<Model>(std::move(data));
     }

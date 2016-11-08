@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 #include "ThreadPool.h"
 #include <thread>
+#include <log.h>
 
 TEST(ThreadPoolTests, SimpleChecks) {
     ThreadPool pool(4);
@@ -13,9 +14,6 @@ TEST(ThreadPoolTests, SimpleChecks) {
     pool.stop();
 
     EXPECT_TRUE(pool.isStopped());
-
-    std::cout << "=============" << std::endl;
-
 }
 
 TEST(ThreadPoolTests, TestTasks) {
@@ -63,6 +61,6 @@ TEST(ThreadPoolTests, WaitForTasks) {
 
         EXPECT_EQ(0, pool.getActiveTaskCount());
     } catch (const std::exception &e) {
-        std::cout << "Exception:" << e.what() << std::endl;
+        LOG_ERROR << "Exception:" << e.what();
     }
 }

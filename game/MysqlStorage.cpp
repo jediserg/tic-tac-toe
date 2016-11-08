@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 #include "MysqlStorage.h"
+#include "log.h"
 #include <cppconn/driver.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
@@ -63,7 +64,7 @@ MysqlStorage::loadData(std::string table, std::string id_field, std::string id_v
 
     std::unique_ptr<sql::ResultSet> query_result(prepared_stmt->executeQuery());
 
-    std::cout << query_stream.str() << ", " << id_value << std::endl;
+    LOG_DEBUG << query_stream.str() << ", " << id_value << std::endl;
 
     if (!query_result->next())
         return result;

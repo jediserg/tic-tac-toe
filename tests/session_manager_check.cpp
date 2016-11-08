@@ -25,7 +25,6 @@ TEST_F(DbFixture, TestUserRegister) {
 
     sm.onRegisterRequest({{"name", "UserName"}, {"password", "test"}}, [](nlohmann::json&& response){
         auto error = response["error"];
-        std::cout << error << std::endl;
         EXPECT_EQ(response[Api::COMMAND_FIELD], "userCreated");
     });
 
@@ -51,11 +50,11 @@ TEST_F(DbFixture, TestUserLogin) {
 
     db.createTable<User>();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    ThreadPool::getInstance().waitForTasks();
 
     db.save(User({{"name", "UserName"}, {"password", "test"}, {"win_count", "1"}}));
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    ThreadPool::getInstance().waitForTasks();
 
     SessionManager<int> sm;
     sm.newConnection(1);
@@ -67,4 +66,6 @@ TEST_F(DbFixture, TestUserLogin) {
     }, [](std::shared_ptr<User> user, nlohmann::json &&request) {
         EXPECT_FALSE(true);
     });
+
+    ThreadPool::getInstance().waitForTasks();
 }

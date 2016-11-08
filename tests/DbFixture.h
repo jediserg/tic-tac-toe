@@ -15,7 +15,7 @@ class DbFixture : public ::testing::Test {
 public:
     static constexpr const char *HOST = "localhost";
     static constexpr const char *USER = "root";
-    static constexpr const char *PASSWORD = "testroot";
+    static constexpr const char *PASSWORD = "root";
     static constexpr const char *DB = "test-game-db";
 
     DbFixture() {
@@ -28,8 +28,6 @@ public:
 
         delete stmt;
         delete con;
-
-        std::cout << "Test db created" << std::endl;
     }
 
     ~DbFixture() {
@@ -41,8 +39,6 @@ public:
 
         delete stmt;
         delete con;
-
-        std::cout << "Test db droped" << std::endl;
     }
 
 private:

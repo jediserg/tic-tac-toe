@@ -5,7 +5,11 @@
 #ifndef TIC_TAC_TOE_LOG_H
 #define TIC_TAC_TOE_LOG_H
 
+#define BOOST_LOG_DYN_LINK 1
+
 #include <boost/log/trivial.hpp>
+
+//#define BOOST_LOG_DYN_LINK 1
 
 #define LOG(X) BOOST_LOG_TRIVIAL(X)
 

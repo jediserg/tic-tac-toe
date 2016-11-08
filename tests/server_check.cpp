@@ -1,7 +1,7 @@
 //
 // Created by serg on 10/28/16.
 //
-#define BOOST_LOG_DYN_LINK 1
+//#define BOOST_LOG_DYN_LINK 1
 #include <gtest/gtest.h>
 #include "Server.h"
 #include "FakeServer.h"
@@ -76,8 +76,6 @@ TEST_F(DbFixture, TestServer) {
 })STR");
     ThreadPool::getInstance().waitForTasks();
     nlohmann::json response_login = nlohmann::json::parse(connection->second.last_out_message);
-
-    std::cout << response_login << std::endl;
 
     EXPECT_EQ(response_login["command"], "loggedIn");
 }

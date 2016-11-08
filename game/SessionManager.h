@@ -21,6 +21,7 @@ class SessionManager {
 public:
     using Callback = std::function<void(nlohmann::json &&)>;
     using ConnectionsMap = std::map<Connection, std::shared_ptr<User>, Comparation>;
+    using ConnectionByUserNameMap = std::map<std::string, Connection>;
     using ProcessRequest = std::function<void(std::shared_ptr<User>, nlohmann::json &&)>;
 
     static constexpr const char *REGISTER_COMMAND = "register";
@@ -56,11 +57,11 @@ public:
                                                   {"win_count", "0"},
                                           }));
             } catch (const std::exception &e) {
-                std::cout << "Couldn't create user:" << e.what();
+                LOG_ERROR << "Couldn't create user:" << e.what();
                 callback({{ERROR_FIELD, "Couldn't create User"}});
                 return;
             } catch (...) {
-                std::cout << "Couldn't create user";
+                LOG_ERROR << "Couldn't create user";
                 callback({{ERROR_FIELD, "Couldn't create User"}});
                 return;
             }
@@ -81,8 +82,6 @@ public:
 
         std::string command = request[Api::COMMAND_FIELD];
 
-        std::cout << request << std::endl;
-
         if (command == LOGIN_COMMAND) {
             auto login = request.find(USER_LOGIN_FIELD);
             auto password = request.find(USER_PASSWORD_FIELD);
@@ -98,20 +97,23 @@ public:
 
             ThreadPool::getInstance().addTask([str_name, str_password, response, next, connection, this]() {
                 try {
-                    auto user = getMysqlStore().load<User>("name");
+                    auto user = getMysqlStore().load<User>(str_name);
 
-                    if (user->getPassword() == str_password) {
+                    if (user && user->getPassword() == str_password) {
                         std::lock_guard<std::mutex> guard(_mutex);
 
                         _connections[connection] = user;
+                        _connections_by_user_name[str_name] = connection;
+                    } else {
+                        response({{ERROR_FIELD, "Bad login or password"}});
                     }
                 } catch (const std::exception &e) {
-                    std::cout << "Couldn't create user:" << e.what();
-                    response({{ERROR_FIELD, "Couldn't create User"}});
+                    LOG_ERROR << "Couldn't load user:" << e.what();
+                    response({{ERROR_FIELD, "Couldn't load User"}});
                     return;
                 } catch (...) {
-                    std::cout << "Couldn't create user";
-                    response({{ERROR_FIELD, "Couldn't create User"}});
+                    LOG_ERROR << "Couldn't load user";
+                    response({{ERROR_FIELD, "Couldn't load User"}});
                     return;
                 }
             });
@@ -144,7 +146,16 @@ public:
     void closeConnection(Connection connection) {
         std::lock_guard<std::mutex> guard(_mutex);
 
-        _connections.erase(connection);
+        auto it = _connections.find(connection);
+        if (it != _connections.end()) {
+            if (it->second) {
+                auto user_it = _connections_by_user_name.find(it->second->getName());
+                _connections_by_user_name.erase(user_it);
+            }
+            _connections.erase(it);
+        }
+
+
     }
 
     std::shared_ptr<User> getUser(Connection connection) {
@@ -157,8 +168,20 @@ public:
 
         return it->second;
     }
+
+    Connection getUserConnection(const std::string &user_name) {
+        std::lock_guard<std::mutex> guard(_mutex);
+
+        auto it = _connections_by_user_name.find(user_name);
+        if (it == _connections_by_user_name.end())
+            throw (std::invalid_argument(std::string("No connection for user:") + user_name));
+
+        return it->second;
+    }
 private:
     ConnectionsMap _connections;
+    ConnectionByUserNameMap _connections_by_user_name;
+
     mutable std::mutex _mutex;
 };
 

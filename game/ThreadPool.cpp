@@ -3,8 +3,8 @@
 //
 #include "ThreadPool.h"
 #include <thread>
-#include <cassert>
 #include <iostream>
+#include "log.h"
 
 ThreadPool::ThreadPool(size_t N) : _stopped(false), _active_task_count(0), _run_threads_count(N)
 {
@@ -47,7 +47,7 @@ ThreadPool::ThreadPool(size_t N) : _stopped(false), _active_task_count(0), _run_
                 try {
                     task();
                 } catch (std::exception &e) {
-                    std::cout << "Exception:" << e.what() << std::endl;
+                    LOG_ERROR << "Exception:" << e.what();
                 }
             }
         }).detach();

@@ -7,6 +7,7 @@
 #include <string>
 #include <memory>
 #include "WSServerImpl.h"
+#include "log.h"
 
 WSServerImpl::WSServerImpl(std::string endpoint, uint16_t port, size_t thread_count) : _server(port, thread_count) {
     auto &handlers = _server.endpoint["^/tic-tac-toe/?$"];
@@ -46,8 +47,8 @@ void WSServerImpl::sendMessage(WSServerImpl::Connection connection, std::string 
 
     _server.send(connection, send_stream, [](const boost::system::error_code &ec) {
         if (ec) {
-            std::cout << "Server: Error sending message. " <<
-                      "Error: " << ec << ", error message: " << ec.message() << std::endl;
+            LOG_ERROR << "Server: Error sending message. " <<
+                      "Error: " << ec << ", error message: " << ec.message();
         }
     });
 }
