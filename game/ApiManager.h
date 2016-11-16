@@ -27,18 +27,13 @@ public:
 
     Api &api(const std::string &name);
 
-    bool isApiSupported(std::string name) noexcept;
+    bool isApiSupported(std::string name) const noexcept;
 
     bool callApi(std::shared_ptr<User> user, nlohmann::json &&request, Api::Callback callback) const noexcept;
 
     void setHandler(std::string api_name, std::string command, Api::Handler handler);
 
     void setHandlerForAllApi(std::string command, Api::Handler handler);
-
-    static ApiManager &get();
-
-    static const ApiManager &get_const();
-
 private:
     ApiMap _api_map;
 };

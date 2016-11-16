@@ -4,12 +4,11 @@
 
 #include "Board.h"
 
-Board::Board(unsigned long size) : _cells(size, size, Mark::UNMARKED) {
-
+Board::Board(unsigned long size) : _cells(size, std::vector<Mark>(size, Mark::UNMARKED)), _size(size) {
 }
 
 void Board::putMark(unsigned long row, unsigned long column, Mark mark) {
-    _cells(row, column) = mark;
+    _cells[row][column] = mark;
 }
 
 const Board::Cells &Board::getCells() const {
@@ -18,59 +17,77 @@ const Board::Cells &Board::getCells() const {
 
 
 Mark Board::getCell(unsigned long row, unsigned long column) const {
-    if (row > _cells.size1())
-        throw std::invalid_argument("Invalid row number");
-
-    if (row > _cells.size2())
-        throw std::invalid_argument("Invalid row number");
-
-    return _cells(row, column);
+    return _cells[row][column];
 }
 
 Win Board::isWin(Mark mark) const {
-    std::vector<unsigned long> marksInRow(_cells.size1(), 0);
-    unsigned long marksInCurrentColumn = 0;
+    std::vector<int> marksInRow(_cells.size(), 0);
+    int marksInCurrentColumn = 0;
 
-    unsigned long marksInDiagonal1 = 0;
-    unsigned long marksInDiagonal2 = 0;
+    int marksInDiagonal1 = 0;
+    int marksInDiagonal2 = 0;
 
-    for (unsigned long i = 0; i < _cells.size1(); ++i) {
-        for (unsigned long j = 0; j < _cells.size2(); ++j) {
-            if (_cells(i, j) == mark) {
+    for (int i = 0; i < _size; ++i) {
+        for (int j = 0; j < _size; ++j) {
+            if (_cells[i][j] == mark) {
                 marksInCurrentColumn++;
                 marksInRow[j]++;
 
                 if (i == j)
                     marksInDiagonal1++;
 
-                if (_cells.size1() - i - 1 == j)
+                if (_size - i - 1 == j)
                     marksInDiagonal2++;
             }
         }
 
-        if (marksInCurrentColumn == _cells.size2())
+        if (marksInCurrentColumn == _size)
             return Win(mark, WinType::ROW_EQUAL, i);
 
         marksInCurrentColumn = 0;
     }
 
-    if (marksInDiagonal1 == _cells.size1())
+    if (marksInDiagonal1 == _size)
         return Win(mark, WinType::DIAGONAL_EQUAL, 1);
 
-    if (marksInDiagonal2 == _cells.size1())
+    if (marksInDiagonal2 == _size)
         return Win(mark, WinType::DIAGONAL_EQUAL, 2);
 
-    for (unsigned long i = 0; i < marksInRow.size(); i++)
-        if (marksInRow[i] == _cells.size2())
+    for (int i = 0; i < marksInRow.size(); i++)
+        if (marksInRow[i] == _size)
             return Win(mark, WinType::COLUMN_EQUAL, i);
 
     return Win();
 }
 
-void Board::putRow(unsigned long num, std::vector<Mark> marks) {
-    if (marks.size() != _cells.size1())
+void Board::putRow(int num, std::vector<Mark> marks) {
+    if (marks.size() != _size)
         throw std::invalid_argument("Invalid row number");
 
-    for (unsigned long i = 0; i < marks.size(); i++)
-        _cells(num, i) = marks[i];
+    _cells[num] = marks;
+}
+
+/*
+ * {
+ *  "board" : [
+ *      [0, 1, 2],
+ *      [0, 0, 2],
+ *      [0, 0, 0]
+ *  ]
+ * }
+*/
+nlohmann::json Board::toJson() const {
+    nlohmann::json json;
+    nlohmann::json temp_json;
+
+    json["board"] = nlohmann::json::array();
+
+    for (const auto &row : _cells) {
+        std::vector<int> json_row(_size);
+        for (int i = 0; i < _size; ++i) {
+            json_row[i] = static_cast<int>(row[i]);
+        }
+        json["board"].push_back(json_row);
+    }
+    return json;
 }

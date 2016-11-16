@@ -12,15 +12,14 @@
 #include "ApiManager.h"
 #include "User.h"
 #include "StoreInstance.h"
-#include <StoreInstance.h>
 #include "ThreadPool.h"
 #include <mutex>
 
-template<typename Connection, typename Comparation = std::less<Connection>>
+template<class Connection, class ConcreteStore>
 class SessionManager {
 public:
     using Callback = std::function<void(nlohmann::json &&)>;
-    using ConnectionsMap = std::map<Connection, std::shared_ptr<User>, Comparation>;
+    using ConnectionsMap = std::map<Connection, std::shared_ptr<User>>;
     using ConnectionByUserNameMap = std::map<std::string, Connection>;
     using ProcessRequest = std::function<void(std::shared_ptr<User>, nlohmann::json &&)>;
 
@@ -32,7 +31,7 @@ public:
     static constexpr const char *ERROR_FIELD = "error";
     static constexpr const char *USER_PASSWORD_FIELD = "password";
 
-    SessionManager() {
+    SessionManager(ConcreteStore &store) : _store(store) {
     }
 
     void onRegisterRequest(nlohmann::json &&json,
@@ -179,6 +178,7 @@ public:
         return it->second;
     }
 private:
+    ConcreteStore &_store;
     ConnectionsMap _connections;
     ConnectionByUserNameMap _connections_by_user_name;
 

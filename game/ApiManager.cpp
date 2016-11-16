@@ -8,7 +8,7 @@ Api &ApiManager::api(const std::string &name) {
     return _api_map.at(name);
 }
 
-bool ApiManager::isApiSupported(std::string name) noexcept {
+bool ApiManager::isApiSupported(std::string name) const noexcept {
     return _api_map.find(std::move(name)) != _api_map.end();
 }
 
@@ -23,16 +23,6 @@ bool ApiManager::callApi(std::shared_ptr<User> user, nlohmann::json &&request, A
         return false;
 
     return api_it->second.call(user, std::move(request), callback);
-}
-
-ApiManager &ApiManager::get() {
-    static ApiManager api_manager;
-    return api_manager;
-}
-
-const ApiManager &ApiManager::get_const() {
-    const ApiManager &const_api_manager = get();
-    return const_api_manager;
 }
 
 void ApiManager::setSupportedApi(std::string api_name) {

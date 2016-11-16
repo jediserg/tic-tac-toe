@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 #include "Server.h"
 #include "FakeServer.h"
-#include "SessionManager.h"
 #include "DbFixture.h"
 
 TEST_F(DbFixture, TestServer) {
@@ -35,7 +34,7 @@ TEST_F(DbFixture, TestServer) {
                            });
 
     FakeServer fakeServer;
-    Server<FakeServer, SessionManager<FakeServer::Connection>> server(api_manager, fakeServer);
+    Server<FakeServer> server(api_manager, fakeServer);
     server.run();
 
     EXPECT_TRUE(fakeServer._is_run);

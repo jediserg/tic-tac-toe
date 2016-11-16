@@ -97,7 +97,7 @@ public:
     }
 
     template<class Model>
-    void addSchema(std::string id_field, std::map<std::string, std::function<std::string(const Model *)>> fields) {
+    void addTable(std::string id_field, std::map<std::string, std::function<std::string(const Model *)>> fields) {
         LOG_DEBUG << "Add model:" << typeid(Model).name() << std::endl;
 
         addTable(id_field, typeid(Model).name(), std::move(fields));

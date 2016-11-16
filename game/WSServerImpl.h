@@ -8,13 +8,14 @@
 #include <cstdint>
 #include <string>
 #include <websocket/server_ws.hpp>
+#include <memory>
 
 class WSServerImpl
 {
 public:
     using WsServer = SimpleWeb::SocketServer<SimpleWeb::WS>;
     using Connection = std::shared_ptr<WsServer::Connection>;
-    using Compare = std::owner_less<WsServer::Connection>;
+    using Compare = std::less<WsServer::Connection>;//std::owner_less<WsServer::Connection>;
 
     using NewConnectionHandler = std::function<void(Connection)>;
     using MessageHandler = std::function<void(Connection, std::string &&)>;

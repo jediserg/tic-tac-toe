@@ -18,7 +18,6 @@ public:
     const std::string &getPassword() const;
 
     int getWinCount() const;
-
 private:
     std::string _name;
     std::string _password;

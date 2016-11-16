@@ -6,7 +6,8 @@
 #define TIC_TAC_TOE_BOARD_H
 
 #include <cstddef>
-#include <boost/numeric/ublas/matrix.hpp>
+//#include <boost/numeric/ublas/matrix.hpp>
+#include <json.hpp>
 
 enum class Mark {
     UNMARKED = 0, X = 1, O = 2
@@ -17,7 +18,7 @@ enum class WinType {
 };
 
 struct Win {
-    Win(Mark m, WinType t, unsigned long v) : mark(m), type(t), value(v) {}
+    Win(Mark m, WinType t, int v) : mark(m), type(t), value(v) {}
 
     Win() : type(WinType::NONE) {}
 
@@ -33,7 +34,7 @@ struct Win {
 
     Mark mark;
     WinType type;
-    unsigned long value;
+    int value;
 };
 
 struct Position {
@@ -44,21 +45,24 @@ struct Position {
 
 class Board {
 public:
-    using Cells = boost::numeric::ublas::matrix<Mark>;
+    using Cells = std::vector<std::vector<Mark>>;
 
     Board(unsigned long size);
 
     void putMark(unsigned long row, unsigned long column, Mark mark);
 
-    void putRow(unsigned long num, std::vector<Mark> marks);
+    void putRow(int num, std::vector<Mark> marks);
 
     const Cells &getCells() const;
 
     Mark getCell(unsigned long row, unsigned long column) const;
 
     Win isWin(Mark mark) const;
+
+    nlohmann::json toJson() const;
 private:
     Cells _cells;
+    size_t _size;
 };
 
 

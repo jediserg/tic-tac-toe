@@ -127,7 +127,7 @@ TEST(BoardTests, WinCheckDiagonals) {
 }
 
 TEST(BoardTests, WinCheckLargeBoard) {
-    const unsigned long BOARD_SIZE = 999;
+    const int BOARD_SIZE = 999;
 
     {
         Board board(BOARD_SIZE);
@@ -145,7 +145,7 @@ TEST(BoardTests, WinCheckLargeBoard) {
         std::vector<Mark> marks(BOARD_SIZE, Mark::O);
         marks[100] = Mark::X;
 
-        for (unsigned long i = 0; i < BOARD_SIZE; i++) {
+        for (int i = 0; i < BOARD_SIZE; i++) {
             board.putRow(i, marks);
         }
 
@@ -171,4 +171,18 @@ TEST(BoardTests, WinCheckLargeBoard) {
 
         EXPECT_EQ(Win(Mark::X, WinType::DIAGONAL_EQUAL, 2), board.isWin(Mark::X));
     }
+}
+
+TEST(BoardTests, CheckJson) {
+    Board board(3);
+
+    std::string expected_json_str = R"RAW({"board":[[2,0,1],[2,1,1],[1,1,2]]})RAW";
+
+    board.putRow(0, {Mark::O, Mark::UNMARKED, Mark::X});
+    board.putRow(1, {Mark::O, Mark::X, Mark::X});
+    board.putRow(2, {Mark::X, Mark::X, Mark::O});
+
+    nlohmann::json json = board.toJson();
+
+    EXPECT_EQ(expected_json_str, json.dump());
 }

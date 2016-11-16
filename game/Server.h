@@ -9,16 +9,18 @@
 #include <json.hpp>
 #include "ApiManager.h"
 #include "log.h"
+#include "SessionManager.h"
 
-
-template<class Impl, class SM>
+template<class Impl, class ConcreteStore>
 class Server {
 public:
     using Connection = typename Impl::Connection;
-    using Compare    = typename Impl::Compare;
-    typedef Server<Impl, SM> ServerType;
 
-    Server(ApiManager &api_manager, Impl &impl) : _impl(impl), _api_manager(api_manager) {}
+    typedef Server<Impl, ConcreteStore> ServerType;
+
+    Server(ApiManager &api_manager, Impl &impl, ConcreteStore &_store) : _impl(impl),
+                                                                         _session_mgr(_store),
+                                                                         _api_manager(api_manager) {}
 
     Server(const Server &) = delete;
 
@@ -63,7 +65,7 @@ private:
             return;
         }
 
-        auto &api = _api_manager.api(*api_name_it);
+        const auto &api = _api_manager.api(*api_name_it);
 
         using namespace std::placeholders;
 
@@ -108,7 +110,7 @@ private:
     }
 
     Impl &_impl;
-    SM _session_mgr;
+    SessionManager<Connection, ConcreteStore> _session_mgr;
     ApiManager &_api_manager;
 };
 

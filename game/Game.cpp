@@ -25,7 +25,7 @@ const std::vector<std::shared_ptr<User>> Game::getObservers() const {
 }
 
 void Game::onMove(Mark mark, unsigned long row, unsigned long column) {
-    if ()
+    // if ()
 }
 
 void Game::start() {
@@ -35,5 +35,5 @@ void Game::start() {
     _player2->onMove(std::bind(&Game::onMove, this, Mark::O, _1, _2));
 
     _current_turn = Mark::X;
-    _player1->yourTurn(_board);
+    //_player1->yourTurn(_board);
 }
