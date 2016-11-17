@@ -10,6 +10,7 @@
 #include "ApiManager.h"
 #include "log.h"
 #include "SessionManager.h"
+#include "Store.h"
 
 template<class Impl, class ConcreteStore>
 class Server {
@@ -18,9 +19,9 @@ public:
 
     typedef Server<Impl, ConcreteStore> ServerType;
 
-    Server(ApiManager &api_manager, Impl &impl, ConcreteStore &_store) : _impl(impl),
-                                                                         _session_mgr(_store),
-                                                                         _api_manager(api_manager) {}
+    Server(ApiManager &api_manager, Impl &impl, Store<ConcreteStore> &_store) : _impl(impl),
+                                                                                _session_mgr(_store),
+                                                                                _api_manager(api_manager) {}
 
     Server(const Server &) = delete;
 
@@ -110,7 +111,7 @@ private:
     }
 
     Impl &_impl;
-    SessionManager<Connection, ConcreteStore> _session_mgr;
+    SessionManager<Connection, Store<ConcreteStore>> _session_mgr;
     ApiManager &_api_manager;
 };
 

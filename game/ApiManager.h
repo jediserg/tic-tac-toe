@@ -34,6 +34,8 @@ public:
     void setHandler(std::string api_name, std::string command, Api::Handler handler);
 
     void setHandlerForAllApi(std::string command, Api::Handler handler);
+
+    void setHandlerForApi(std::vector<std::string> api_names, std::string command, Api::Handler handler);
 private:
     ApiMap _api_map;
 };

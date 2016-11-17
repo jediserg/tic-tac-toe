@@ -5,23 +5,27 @@
 #ifndef TIC_TAC_TOE_SESSIONMANAGER_H
 #define TIC_TAC_TOE_SESSIONMANAGER_H
 
+#include "log.h"
 #include <exception>
 #include <functional>
 #include <json.hpp>
 #include <map>
 #include "ApiManager.h"
 #include "User.h"
-#include "StoreInstance.h"
 #include "ThreadPool.h"
 #include <mutex>
+//#include "Store.h"
+//#include "MysqlStorage.h"
+#include <type_traits>
 
-template<class Connection, class ConcreteStore>
+template<class Connection, class StoreClass>
 class SessionManager {
 public:
     using Callback = std::function<void(nlohmann::json &&)>;
     using ConnectionsMap = std::map<Connection, std::shared_ptr<User>>;
     using ConnectionByUserNameMap = std::map<std::string, Connection>;
     using ProcessRequest = std::function<void(std::shared_ptr<User>, nlohmann::json &&)>;
+    //using StoreClass = Store<ConcreteStore>;
 
     static constexpr const char *REGISTER_COMMAND = "register";
     static constexpr const char *LOGIN_COMMAND = "login";
@@ -31,7 +35,8 @@ public:
     static constexpr const char *ERROR_FIELD = "error";
     static constexpr const char *USER_PASSWORD_FIELD = "password";
 
-    SessionManager(ConcreteStore &store) : _store(store) {
+    SessionManager(StoreClass &store) : _store(store) {
+
     }
 
     void onRegisterRequest(nlohmann::json &&json,
@@ -48,9 +53,9 @@ public:
         if (str_name.empty() || str_password.empty())
             return callback({{ERROR_FIELD, "Name or password empty"}});
 
-        ThreadPool::getInstance().addTask([str_name, str_password, callback]() {
+        ThreadPool::getInstance().addTask([str_name, str_password, callback, this]() {
             try {
-                getMysqlStore().save(User({
+                _store.save(User({
                                                   {"name",      str_name},
                                                   {"password",  str_password},
                                                   {"win_count", "0"},
@@ -96,7 +101,7 @@ public:
 
             ThreadPool::getInstance().addTask([str_name, str_password, response, next, connection, this]() {
                 try {
-                    auto user = getMysqlStore().load<User>(str_name);
+                    auto user = _store.template load<User>(str_name);
 
                     if (user && user->getPassword() == str_password) {
                         std::lock_guard<std::mutex> guard(_mutex);
@@ -178,7 +183,7 @@ public:
         return it->second;
     }
 private:
-    ConcreteStore &_store;
+    StoreClass &_store;
     ConnectionsMap _connections;
     ConnectionByUserNameMap _connections_by_user_name;
 

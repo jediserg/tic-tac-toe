@@ -2,12 +2,13 @@
 // Created by serg on 10/28/16.
 //
 #include <gtest/gtest.h>
-#include <StoreInstance.h>
 #include <SessionManager.h>
+#include <MysqlStorage.h>
+#include <Store.h>
 #include "DbFixture.h"
 
 TEST_F(DbFixture, TestUserRegister) {
-    auto& db = getMysqlStore(HOST, USER, PASSWORD, DB, 4);
+    Store<MysqlStorage> db{HOST, USER, PASSWORD, DB, 4};
 
     db.addTable<User>("user", "name", {
             {"name",    &User::getName},
@@ -21,7 +22,7 @@ TEST_F(DbFixture, TestUserRegister) {
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-    SessionManager<int> sm;
+    SessionManager<int, Store<MysqlStorage>> sm(db);
 
     sm.onRegisterRequest({{"name", "UserName"}, {"password", "test"}}, [](nlohmann::json&& response){
         auto error = response["error"];
@@ -40,7 +41,7 @@ TEST_F(DbFixture, TestUserRegister) {
 }
 
 TEST_F(DbFixture, TestUserLogin) {
-    auto& db = getMysqlStore(HOST, USER, PASSWORD, DB, 4);
+    Store<MysqlStorage> db{HOST, USER, PASSWORD, DB, 4};
 
     db.addTable<User>("user", "name", {
             {"name",    &User::getName},
@@ -56,7 +57,7 @@ TEST_F(DbFixture, TestUserLogin) {
 
     ThreadPool::getInstance().waitForTasks();
 
-    SessionManager<int> sm;
+    SessionManager<int, Store<MysqlStorage>> sm(db);
     sm.newConnection(1);
     sm.processRequest(1, {{Api::COMMAND_FIELD, "login"},
                           {"login",            "UserName"},

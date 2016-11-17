@@ -38,6 +38,12 @@ void ApiManager::setSupportedApi(std::initializer_list<std::string> api_names) {
         _api_map.emplace(api, api);
 }
 
+void ApiManager::setHandlerForApi(std::vector<std::string> api_names, std::string command, Api::Handler handler) {
+    for (auto cmd : api_names) {
+        api(cmd).setHandler(command, handler);
+    }
+}
+
 void ApiManager::setHandler(std::string api_name, std::string command, Api::Handler handler) {
     Api &api = _api_map.at(api_name);
     api.setHandler(command, handler);

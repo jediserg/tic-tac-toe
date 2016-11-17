@@ -7,8 +7,8 @@
 #include <Validatable.h>
 #include <MysqlStorage.h>
 #include "FakeStore.h"
-#include "StoreInstance.h"
 #include "DbFixture.h"
+#include "Store.h"
 
 
 class TestClass : public Validatable {
@@ -81,13 +81,4 @@ TEST(CheckStore, CheckSaveLoadFromFakeDb) {
     EXPECT_EQ("value1", obj1->getField1());
     EXPECT_EQ("value2", obj1->getField2());
     EXPECT_EQ(42, obj1->getIntField());
-}
-
-TEST_F(DbFixture, CheckGettingStoreInstance) {
-    auto &store1 = getMysqlStore(HOST, USER, PASSWORD, DB, 4);
-    auto &store2 = getMysqlStore();
-    auto &store3 = getMysqlStore();
-
-    EXPECT_EQ(&store1, &store2);
-    EXPECT_EQ(&store1, &store3);
 }

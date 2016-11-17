@@ -3,12 +3,14 @@
 //
 
 #include "GameManager.h"
+#include "Game.h"
 
-GameManager &GameManager::getInstance() {
-    static GameManager game_manager;
-    return game_manager;
+void GameManager::_onShowGameStatus() {
+
 }
 
-GameManager::GameManager() {
+void GameManager::setHandlers() {
+    _api_manager.setHandlerForApi({"1.0", "2.0"}, GET_GAMES_LIST, []() {
 
+    });
 }

@@ -6,9 +6,10 @@
 #include "Server.h"
 #include "FakeServer.h"
 #include "DbFixture.h"
+#include "MysqlStorage.h"
 
 TEST_F(DbFixture, TestServer) {
-    auto &db = getMysqlStore(HOST, USER, PASSWORD, DB, 4);
+    Store<MysqlStorage> db(HOST, USER, PASSWORD, DB, 4);
 
     db.addTable<User>("user", "name", {
             {"name",      &User::getName},
@@ -34,7 +35,7 @@ TEST_F(DbFixture, TestServer) {
                            });
 
     FakeServer fakeServer;
-    Server<FakeServer> server(api_manager, fakeServer);
+    Server<FakeServer, MysqlStorage> server(api_manager, fakeServer, db);
     server.run();
 
     EXPECT_TRUE(fakeServer._is_run);

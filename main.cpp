@@ -4,7 +4,6 @@
 #include "game/ApiManager.h"
 #include "game/ThreadPool.h"
 #include "game/MysqlStorage.h"
-#include "game/StoreInstance.h"
 #include "game/User.h"
 #include <cxxopts/cxxopts.hpp>
 #include "game/Server.h"
@@ -41,7 +40,7 @@ int main(int argc, char **argv) {
 
     ThreadPool::getInstance(2);
 
-    Store<MysqlStorage> &db = getMysqlStore(host, user, password, database, 4);
+    Store<MysqlStorage> db{host, user, password, database, 4};
 
     db.addTable<User>("user", "name", {
             {"name",      &User::getName},
@@ -58,7 +57,7 @@ int main(int argc, char **argv) {
 
     WSServerImpl impl("localhost", 1234, 2);
 
-    Server<WSServerImpl, Store<MysqlStorage>> server(api_manager, impl, db);
+    Server<WSServerImpl, MysqlStorage> server(api_manager, impl, db);
     server.run();
 
     return 0;
