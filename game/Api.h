@@ -22,8 +22,7 @@ class User;
 
 class Api {
 public:
-    using Callback = std::function<void(nlohmann::json &&)>;
-    using Handler = std::function<bool(std::shared_ptr<User>, nlohmann::json &&, Callback)>;
+    using Handler = std::function<bool(std::shared_ptr<User>, nlohmann::json &&)>;
     using Handlers = std::map<std::string, Handler>;
 
     Api(std::string name);
@@ -38,7 +37,7 @@ public:
 
     void disable();
 
-    bool call(std::shared_ptr<User> user, nlohmann::json &&request, Callback callback) const;
+    bool call(std::shared_ptr<User> user, nlohmann::json &&request) const;
 
     const std::string &name() const;
 

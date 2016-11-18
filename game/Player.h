@@ -5,18 +5,16 @@
 #ifndef TIC_TAC_TOE_PLAYER_H
 #define TIC_TAC_TOE_PLAYER_H
 
-#include "PlayerBase.h"
+#include"PlayerBase.h"
 #include "Api.h"
 
 class Player : public PlayerBase {
 public:
-    Player(Api::Callback response);
+    Player(std::string name, Mark mark);
 
 protected:
     virtual void _moveRequest(const Board &board) override;
-
 private:
-    Api::Callback _send_to_player;
 };
 
 

@@ -27,7 +27,7 @@ TEST_F(DbFixture, TestServer) {
 
     bool command1_compleat = false;
     api_manager.setHandler("1.0", "command1",
-                           [&](std::shared_ptr<User> user, nlohmann::json &&request, Api::Callback c) {
+                           [&](std::shared_ptr<User> user, nlohmann::json &&request) {
                                EXPECT_TRUE(user != nullptr);
                                command1_compleat = true;
 

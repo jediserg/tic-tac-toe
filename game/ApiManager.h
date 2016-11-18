@@ -29,7 +29,7 @@ public:
 
     bool isApiSupported(std::string name) const noexcept;
 
-    bool callApi(std::shared_ptr<User> user, nlohmann::json &&request, Api::Callback callback) const noexcept;
+    bool callApi(std::shared_ptr<User> user, nlohmann::json &&request) const noexcept;
 
     void setHandler(std::string api_name, std::string command, Api::Handler handler);
 

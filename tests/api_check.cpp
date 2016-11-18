@@ -31,15 +31,14 @@ TEST(ApiCheck, TestHandlers) {
     const char *TEST_STRING = "This is a test string";
 
     api.setHandler("test",
-                   [TEST_STRING, test_user](std::shared_ptr<User> user, json &&request, Api::Callback callback) {
+                   [TEST_STRING, test_user, &testComandCompleted](std::shared_ptr<User> user, json &&request) {
                        EXPECT_EQ(request[Api::COMMAND_FIELD], "test");
                        EXPECT_EQ(request["param"], "param");
                        EXPECT_EQ(user, test_user);
                        EXPECT_EQ("Name", user->getName());
-
+                       testComandCompleted = true;
                        json result;
                        result["test_string"] = TEST_STRING;
-                       callback(std::move(result));
 
                        return true;
                    });
@@ -48,28 +47,20 @@ TEST(ApiCheck, TestHandlers) {
     request[Api::COMMAND_FIELD] = "test";
     request["param"] = "param";
 
-    EXPECT_TRUE(api.call(test_user, std::move(request), [&testComandCompleted, TEST_STRING](json &&response) {
-        testComandCompleted = true;
-
-        EXPECT_EQ(TEST_STRING, response["test_string"]);
-    }));
+    EXPECT_TRUE(api.call(test_user, std::move(request)));
 
     EXPECT_TRUE(testComandCompleted);
 
     json no_command_request;
     no_command_request["param"] = "param";
 
-    EXPECT_FALSE(api.call(test_user, std::move(no_command_request), [](json &&response) {
-        FAIL();
-    }));
+    EXPECT_FALSE(api.call(test_user, std::move(no_command_request)));
 
     json bad_command_request;
     bad_command_request[Api::COMMAND_FIELD] = "some_other_command";
     bad_command_request["param"] = "param";
 
-    EXPECT_FALSE(api.call(test_user, std::move(bad_command_request), [](json &&response) {
-        FAIL();
-    }));
+    EXPECT_FALSE(api.call(test_user, std::move(bad_command_request)));
 }
 
 TEST(ApiCheck, TestDisabledHandler) {
@@ -80,7 +71,7 @@ TEST(ApiCheck, TestDisabledHandler) {
 
     const char *TEST_STRING = "This is a test string";
 
-    api.setHandler("test", [](std::shared_ptr<User> user, json &&request, Api::Callback callback) {
+    api.setHandler("test", [](std::shared_ptr<User> user, json &&request) {
         //should never be called because api is disabled
         EXPECT_TRUE(false);
 
@@ -93,11 +84,7 @@ TEST(ApiCheck, TestDisabledHandler) {
     request[Api::COMMAND_FIELD] = "test";
     request["param"] = "param";
 
-    EXPECT_FALSE(api.call(test_user, std::move(request), [&testComandCompleted, TEST_STRING](json &&response) {
-        testComandCompleted = true;
-
-        FAIL();
-    }));
+    EXPECT_FALSE(api.call(test_user, std::move(request)));
 
     EXPECT_FALSE(testComandCompleted);
 }

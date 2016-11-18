@@ -17,26 +17,29 @@ class Board;
 
 class Game {
 public:
+    static constexpr size_t BOARD_SIZE = 3;
+
+    Game(std::string player_name);
     std::shared_ptr<PlayerBase> getPlayer1() const;
 
     std::shared_ptr<PlayerBase> getPlayer2() const;
 
-    bool joinAsPlayer(std::shared_ptr<User> user);
+    bool joinAsPlayer(std::string new_user);
 
     void joinAsObserver(std::shared_ptr<User> user);
 
-    const std::vector<std::shared_ptr<User>> getObservers() const;
+    const std::vector<std::string> &getObservers() const;
 
-    void onMove(Mark mark, unsigned long row, unsigned long column);
+    void onMove(std::string name, int row, int column);
 
     void start();
 private:
-    std::vector<std::shared_ptr<User>> _observers;
+    std::vector<std::string> _observers;
 
     std::shared_ptr<PlayerBase> _player1;
     std::shared_ptr<PlayerBase> _player2;
 
-    std::unique_ptr<Board> _board;
+    Board _board;
 
     Mark _current_turn;
 };

@@ -40,7 +40,7 @@ public:
     }
 
     void onRegisterRequest(nlohmann::json &&json,
-                           Api::Callback callback) const {
+                           std::function<void(nlohmann::json &&)> callback) const {
         auto name = json.find(USER_NAME_FIELD);
         auto password = json.find(USER_PASSWORD_FIELD);
 
@@ -74,7 +74,9 @@ public:
         });
     }
 
-    void processRequest(Connection connection, nlohmann::json &&request, Api::Callback response, ProcessRequest next) {
+    void
+    processRequest(Connection connection, nlohmann::json &&request, std::function<void(nlohmann::json &&)> response,
+                   ProcessRequest next) {
         std::unique_lock<std::mutex> guard(_mutex);
 
         auto it = _connections.find(connection);
@@ -162,7 +164,7 @@ public:
 
     }
 
-    std::shared_ptr<User> getUser(Connection connection) {
+    /*std::shared_ptr<User> getUser(Connection connection) {
         std::lock_guard<std::mutex> guard(_mutex);
 
         auto it = _connections.find(connection);
@@ -171,6 +173,33 @@ public:
             throw std::runtime_error("Unknown connection");
 
         return it->second;
+    }*/
+
+    bool userHasConnection(const std::string &user_name) {
+        std::lock_guard<std::mutex> guard(_mutex);
+
+        auto it = _connections_by_user_name.find(user_name);
+        return it != _connections_by_user_name.end();
+    }
+
+    std::shared_ptr<User> getUser(Connection c) {
+        std::lock_guard<std::mutex> guard(_mutex);
+
+        auto user_it = _connections.find(c);
+        if (user_it == _connections.end())
+            return nullptr;
+
+        return user_it->second;
+    }
+
+    std::string getUserName(Connection c) {
+        std::lock_guard<std::mutex> guard(_mutex);
+
+        auto user_it = _connections.find(c);
+        if (user_it == _connections.end())
+            return std::string();
+
+        return user_it->second->getName();
     }
 
     Connection getUserConnection(const std::string &user_name) {

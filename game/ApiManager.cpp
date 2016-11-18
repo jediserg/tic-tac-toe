@@ -12,7 +12,7 @@ bool ApiManager::isApiSupported(std::string name) const noexcept {
     return _api_map.find(std::move(name)) != _api_map.end();
 }
 
-bool ApiManager::callApi(std::shared_ptr<User> user, nlohmann::json &&request, Api::Callback callback) const noexcept {
+bool ApiManager::callApi(std::shared_ptr<User> user, nlohmann::json &&request) const noexcept {
     auto api_name = request.find(API_FIELD);
 
     if (api_name == request.end())
@@ -22,7 +22,7 @@ bool ApiManager::callApi(std::shared_ptr<User> user, nlohmann::json &&request, A
     if (api_it == _api_map.end())
         return false;
 
-    return api_it->second.call(user, std::move(request), callback);
+    return api_it->second.call(user, std::move(request));
 }
 
 void ApiManager::setSupportedApi(std::string api_name) {

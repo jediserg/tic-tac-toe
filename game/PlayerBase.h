@@ -12,7 +12,7 @@ class Position;
 
 class PlayerBase {
 public:
-    PlayerBase() : _mark(Mark::UNMARKED) {}
+    PlayerBase(std::string name, Mark mark) : _name(name), _mark(mark) {}
 
     virtual ~PlayerBase() = default;
 
@@ -34,6 +34,13 @@ protected:
     bool isWaitingForMove() const { return _is_waiting_for_move; }
 
     virtual void _moveRequest(const Board &board) = 0;
+
+    std::string _name;
+public:
+    const std::string &getName() const {
+        return _name;
+    }
+
 private:
     std::function<void(unsigned long, unsigned long)> _on_move;
     Mark _mark;

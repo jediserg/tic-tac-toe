@@ -4,9 +4,9 @@
 
 #include "Player.h"
 
-Player::Player(Api::Callback response) : PlayerBase(), _send_to_player(response) {}
+Player::Player(std::string name, Mark mark) : PlayerBase(name, mark) {}
 
 void Player::_moveRequest(const Board &board) {
-    _send_to_player(board.toJson());
+    //_send_to_player(board.toJson());
 }
 

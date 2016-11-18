@@ -42,15 +42,15 @@ TEST(ApiManagerCheck, CallApi) {
     auto &api1 = api_manager.api("1.0");
     auto &api2 = api_manager.api("2.0");
 
+    bool test_handler_was_called = false;
+
     std::shared_ptr<User> test_user = std::make_shared<User>(std::map<std::string, std::string>({{"name", "User"}}));
 
-    api1.setHandler("test", [](std::shared_ptr<User> user, json &&request, Api::Callback callback) {
+    api1.setHandler("test", [&test_handler_was_called](std::shared_ptr<User> user, json &&request) {
         json response{
                 {"result", "OK"}
         };
-
-        callback(std::move(response));
-
+        test_handler_was_called = true;
         return true;
 
     });
@@ -60,9 +60,7 @@ TEST(ApiManagerCheck, CallApi) {
             {"param",   "test"}
     };
 
-    EXPECT_FALSE(api_manager.callApi(test_user, std::move(no_api_request), [](json &&response) {
-        FAIL();
-    }));
+    EXPECT_FALSE(api_manager.callApi(test_user, std::move(no_api_request)));
 
     json bad_api_request{
             {"api",     "3.0"},
@@ -70,9 +68,7 @@ TEST(ApiManagerCheck, CallApi) {
             {"param",   "test"}
     };
 
-    EXPECT_FALSE(api_manager.callApi(test_user, std::move(bad_api_request), [](json &&response) {
-        FAIL();
-    }));
+    EXPECT_FALSE(api_manager.callApi(test_user, std::move(bad_api_request)));
 
 
     json good_request{
@@ -80,6 +76,6 @@ TEST(ApiManagerCheck, CallApi) {
             {Api::COMMAND_FIELD, "test"},
             {"param",            "param"}
     };
-    EXPECT_TRUE(api_manager.callApi(test_user, std::move(good_request), [](json &&response) { ;
-    }));
+    EXPECT_TRUE(api_manager.callApi(test_user, std::move(good_request)));
+    EXPECT_TRUE(test_handler_was_called);
 }

@@ -11,7 +11,7 @@ class Game;
 
 class GameManager {
 public:
-    static const char *GET_GAMES_LIST = "get_game_list";
+    static constexpr const char *GET_GAMES_LIST = "get_game_list";
 
     GameManager(ApiManager &api_manager) : _api_manager(api_manager) {};
 
@@ -22,9 +22,13 @@ public:
     void setHandlers();
 
 private:
-    void _onShowGameStatus();
+    void _onShowGames(std::string user);
 
-    void _onNewGame();
+    void _onNewGame(std::string user);
+
+    void _onJoinGame(std::string user);
+
+    void onCloseConnection(std::string user);
 
     ApiManager &_api_manager;
     std::vector<std::shared_ptr<Game>> _games;

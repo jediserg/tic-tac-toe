@@ -22,7 +22,7 @@ void Api::disable() {
     _is_enabled = false;
 }
 
-bool Api::call(std::shared_ptr<User> user, nlohmann::json &&request, Callback callback) const {
+bool Api::call(std::shared_ptr<User> user, nlohmann::json &&request) const {
     if (!_is_enabled)
         return false;
 
@@ -36,7 +36,7 @@ bool Api::call(std::shared_ptr<User> user, nlohmann::json &&request, Callback ca
     if (handler == _handlers.end())
         return false;
 
-    return handler->second(user, std::move(request), callback);
+    return handler->second(user, std::move(request));
 }
 
 void Api::setHandler(const std::string &command, Api::Handler handler) {

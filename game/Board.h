@@ -49,7 +49,7 @@ public:
 
     Board(unsigned long size);
 
-    void putMark(unsigned long row, unsigned long column, Mark mark);
+    void putMark(int row, int column, Mark mark);
 
     void putRow(int num, std::vector<Mark> marks);
 

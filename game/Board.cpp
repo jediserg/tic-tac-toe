@@ -7,7 +7,7 @@
 Board::Board(unsigned long size) : _cells(size, std::vector<Mark>(size, Mark::UNMARKED)), _size(size) {
 }
 
-void Board::putMark(unsigned long row, unsigned long column, Mark mark) {
+void Board::putMark(int row, int column, Mark mark) {
     _cells[row][column] = mark;
 }
 

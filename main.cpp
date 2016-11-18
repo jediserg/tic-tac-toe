@@ -3,11 +3,10 @@
 #include "game/Api.h"
 #include "game/ApiManager.h"
 #include "game/ThreadPool.h"
-#include "game/MysqlStorage.h"
 #include "game/User.h"
 #include <cxxopts/cxxopts.hpp>
-#include "game/Server.h"
-#include "game/WSServerImpl.h"
+#include "game/ServerType.h"
+
 
 
 int main(int argc, char **argv) {
@@ -57,7 +56,7 @@ int main(int argc, char **argv) {
 
     WSServerImpl impl("localhost", 1234, 2);
 
-    Server<WSServerImpl, MysqlStorage> server(api_manager, impl, db);
+    ServerType server(api_manager, impl, db);
     server.run();
 
     return 0;
